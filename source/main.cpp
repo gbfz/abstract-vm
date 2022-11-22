@@ -25,4 +25,5 @@ int main()
 	auto c = *d - *b;
 	std::cout << c->toString() << '\n';
 	std::cout << c->getType() << '\n';
+	std::cout << c->getPrecision() << '\n';
 }

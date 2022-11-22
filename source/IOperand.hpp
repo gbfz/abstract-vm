@@ -2,7 +2,7 @@
 #include <string>
 #include <memory>
 
-enum class eOperandType
+enum class eOperandType : int8_t
 {
 	Int8,
 	Int16,

@@ -32,31 +32,31 @@ public:
 
 private:
 // actors for operators 
-	auto get_mp_t(mpz_class& mp) const noexcept
-	{ return mp.get_mpz_t(); }
-
-	auto get_mp_t(mpf_class& mp) const noexcept
-	{ return mp.get_mpf_t(); }
-
-	template <class gmpT>
-	auto operate(const IOperand& rhs, auto&& func) const
-	{
-		const auto type = getCommonType(rhs);
-		gmpT a { toString() };
-		gmpT b { rhs.toString() };
-		gmpT result;
-		func(get_mp_t(result), get_mp_t(a), get_mp_t(b));
-		if (didOverflow(result, type))
-			throw std::runtime_error("Overflow!");
-		return OperandFactory::createOperand(type, to_string(result));
-	}
-
 	auto decide(const IOperand& rhs, auto&& i_func, auto&& f_func) const
 	{
 		if (isFloatOperation(rhs))
 			return operate<mpf_class>(rhs, f_func);
 		return operate<mpz_class>(rhs, i_func);
 	}
+
+	template <class gmpT>
+	auto operate(const IOperand& rhs, auto&& func) const
+	{
+		const auto type = this->getCommonType(rhs);
+		gmpT a { this->toString() };
+		gmpT b { rhs.toString() };
+		gmpT result;
+		func(get_mp_t(result), get_mp_t(a), get_mp_t(b));
+		if (didOverflow(result, type))
+			throw std::runtime_error("Overflow!");
+		return OperandFactory::createOperand(type, toString(result));
+	}
+
+	auto get_mp_t(mpz_class& mp) const noexcept
+	{ return mp.get_mpz_t(); }
+
+	auto get_mp_t(mpf_class& mp) const noexcept
+	{ return mp.get_mpf_t(); }
 
 // utils for operators 
 	bool isFloatOperation(const IOperand& rhs) const noexcept
@@ -70,10 +70,10 @@ private:
 	eOperandType getCommonType(const IOperand& rhs) const noexcept
 	{ return std::max(getType(), rhs.getType()); }
 
-	std::string to_string(const mpf_class& c) const
+	auto toString(const mpf_class& c) const
 	{ return std::to_string(c.get_d()); }
 
-	std::string to_string(const mpz_class& c) const
+	auto toString(const mpz_class& c) const
 	{ return std::to_string(c.get_si()); }
 
 	template <class T>
@@ -103,8 +103,8 @@ public:
 	{ std::exchange(value, other.value); }
 
 	Operand() = delete;
-	Operand& operator= (Operand&& other) = delete;
 	Operand& operator= (const Operand& other) = delete;
+	Operand& operator= (Operand&& other) = delete;
 	~Operand() = default; 
 
 // utils 
@@ -112,11 +112,12 @@ public:
 	{
 		switch (Type)
 		{
-			case eOperandType::Int8:   return 8;
-			case eOperandType::Int16:  return 16;
-			case eOperandType::Int32:  return 32;
-			case eOperandType::Float:  return 32;
-			case eOperandType::Double: return 64;
+			using enum eOperandType;
+			case Int8:   return 8;
+			case Int16:  return 16;
+			case Int32:  return 32;
+			case Float:  return 32;
+			case Double: return 64;
 			default: throw std::runtime_error("Type unsupported");
 		}
 	}
@@ -128,5 +129,6 @@ public:
 	{ return value; }
 
 private:
+// member fields 
 	const std::string value;
 };
