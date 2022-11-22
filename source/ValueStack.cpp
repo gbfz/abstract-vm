@@ -12,8 +12,14 @@ void ValueStack::pop()
 const IOperand& ValueStack::top() const
 { return *back(); }
 
-auto ValueStack::cbegin() const
-{ return crbegin(); }
+ValueStack::riter_t ValueStack::begin()
+{ return rbegin(); }
 
-auto ValueStack::cend() const
-{ return crend(); }
+ValueStack::riter_t ValueStack::end()
+{ return rend(); }
+
+const ValueStack::criter_t ValueStack::begin() const
+{ return rbegin(); }
+
+const ValueStack::criter_t ValueStack::end() const
+{ return rend(); }

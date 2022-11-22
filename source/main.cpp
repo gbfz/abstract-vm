@@ -1,22 +1,10 @@
+#include "IOperand.hpp"
 #include "Operand.hpp"
+#include "MachineStack.hpp"
 #include <iostream>
 #include <ostream>
 
-std::ostream& operator<< (std::ostream& out, eOperandType type)
-{
-	using enum eOperandType;
-	switch (type)
-	{
-		case Int8: return out << "Int8";
-		case Int16: return out << "Int16";
-		case Int32: return out << "Int32";
-		case Float: return out << "Float";
-		case Double: return out << "Double";
-	}
-	return out;
-}
-
-int main()
+void testOperand()
 {
 	using enum eOperandType;
 	auto a = OperandFactory::createOperand(Int32, "120");
@@ -26,4 +14,18 @@ int main()
 	std::cout << c->toString() << '\n';
 	std::cout << c->getType() << '\n';
 	std::cout << c->getPrecision() << '\n';
+}
+
+void testMachine()
+{
+	MachineStack ms;
+	ms.push(eInstructionType::Push, eOperandType::Int8, "42");
+	ms.push(eInstructionType::Push, eOperandType::Double, "0.21");
+	ms.push(eInstructionType::Add);
+	ms.dump();
+}
+
+int main()
+{
+	testMachine();
 }
