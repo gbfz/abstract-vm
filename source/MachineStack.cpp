@@ -4,62 +4,61 @@
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <sstream>
 
 MachineStack::MachineStack(MachineStack&& other)
-	: is(std::move(other.is))
-	, vs(std::move(other.vs))
+	: vs(std::move(other.vs))
 {
-	other.is.clear();
 	other.vs.clear();
 }
 
 MachineStack& MachineStack::operator=(MachineStack&& other)
 {
-	is = std::move(other.is);
-	other.is.clear();
 	vs = std::move(other.vs);
 	other.vs.clear();
 	return *this;
 }
 
-void MachineStack::push(eInstructionType i_type,
-						eOperandType o_type,
-						std::string value)
+void MachineStack::push(eOperandType type, std::string value)
 {
-	is.emplace_back(i_type);
-	auto operand = OperandFactory::createOperand(o_type, value);
+	auto operand = OperandFactory::createOperand(type, std::move(value));
 	vs.emplace_back(std::move(operand));
 }
-
-void MachineStack::push(eInstructionType type)
-{ is.emplace_back(type); }
 
 void MachineStack::push(std::unique_ptr<const IOperand> operand)
 { vs.emplace_back(std::move(operand)); }
 
-void MachineStack::pop()
-{
-	is.pop_back();
-	vs.pop_back();
-}
-
 void MachineStack::dump() const
 {
-	using enum eInstructionType;
-	for (auto val_iter = vs.begin(); auto instr : is)
-	{
-		std::cout << instr;
-		if (instr == Push || instr == Assert)
-		{
-			const auto type = (*val_iter)->getType();
-			const auto& val = (*val_iter)->toString();
-			std::cout << ' ' << type << "(" << val << ")";
-			++val_iter;
-		}
-		std::cout << '\n';
-	}
+	for (auto&& operand : vs)
+		std::cout << operand->toString() << '\n';
 }
 
+void MachineStack::assert(eOperandType type, std::string value)
+{
+	const auto& lhs = *vs.back();
+	std::stringstream s;
+	if (lhs.getType() != type)
+	{
+		s << "Type mismatch in assert. ";
+		s << "Expected '" << type << "', got '" << lhs.getType() << "'";
+		throw std::runtime_error(s.str());
+	}
+	if (lhs.toString() != value)
+	{
+		s << "Value mismatch in assert. ";
+		s << "Expected '" << value << "', got '" << lhs.toString() << "'";
+		throw std::runtime_error(s.str());
+	}
+	/*
+	if (lhs.getType() != type)
+		throw std::runtime_error("Type mismatch in assert");
+	if (lhs.toString() != value)
+		throw std::runtime_error("Value mismatch in assert");
+	*/
+}
+
+/*
 void MachineStack::assert()
 {
 	auto [lhs, rhs] = pop_two();
@@ -74,6 +73,7 @@ void MachineStack::assert()
 	if (l_val != r_val)
 		throw std::runtime_error("Value mismatch in assert");
 }
+*/
 
 void MachineStack::add()
 {
@@ -164,6 +164,9 @@ void MachineStack::print() const
 	std::cout << v << ", " << value << '\n';
 }
 
+void MachineStack::pop()
+{ vs.pop_back(); }
+
 std::pair<MachineStack::ptr_t, MachineStack::ptr_t>
 MachineStack::pop_two()
 {
@@ -174,6 +177,7 @@ MachineStack::pop_two()
 	return { std::move(a), std::move(b) };
 }
 
+/*
 void MachineStack::exec()
 {
 	using enum eInstructionType;
@@ -212,6 +216,7 @@ void MachineStack::fill(std::vector<eInstructionType>&& instructions,
 		}
 	}
 }
+*/
 
 std::ostream& operator<< (std::ostream& out, eOperandType type)
 {
@@ -223,26 +228,6 @@ std::ostream& operator<< (std::ostream& out, eOperandType type)
 		case Int32:  return out << "int32";
 		case Float:  return out << "float";
 		case Double: return out << "double";
-	}
-	return out;
-}
-
-std::ostream& operator<< (std::ostream& out, eInstructionType instr)
-{
-	using enum eInstructionType;
-	switch (instr)
-	{
-		case Push:   return out << "push";
-		case Pop:    return out << "pop";
-		case Dump:   return out << "dump";
-		case Assert: return out << "assert";
-		case Add:    return out << "add";
-		case Sub:    return out << "sub";
-		case Mul:    return out << "mul";
-		case Div:    return out << "div";
-		case Mod:    return out << "mod";
-		case Print:  return out << "print";
-		case Exit:   return out << "exit";
 	}
 	return out;
 }

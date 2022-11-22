@@ -71,10 +71,17 @@ private:
 	{ return std::max(getType(), rhs.getType()); }
 
 	auto toString(const mpf_class& c) const
-	{ return std::to_string(c.get_d()); }
+	{
+		mp_exp_t e;
+		std::string s = c.get_str(e);
+		s.insert(e, 1, '.');
+		if (s.back() == '.')
+			s += '0';
+		return s;
+	}
 
 	auto toString(const mpz_class& c) const
-	{ return std::to_string(c.get_si()); }
+	{ return c.get_str(); }
 
 	template <class T>
 	using lim = std::numeric_limits<T>;
