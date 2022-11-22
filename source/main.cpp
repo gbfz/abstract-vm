@@ -27,15 +27,15 @@ void testMachine()
 	sa.add();
 	sa.assert(Double, "42.211111");
 	sa.pop();
-	sa.push(Float,     "0.211111");
+	sa.push(Float, "0.211111");
 	sa.push(Double, "42.211111");
 	sa.sub();
-	// std::cout << sa.vs.back()->toString() << '\n';
 	sa.assert(Double, "42.0");
 	sa.push(Int8, "0");
 	sa.push(Int32, "500");
 	sa.mul();
 	sa.assert(Int32, "0");
+	sa.dump();
 }
 
 int main()

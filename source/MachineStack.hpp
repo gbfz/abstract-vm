@@ -1,18 +1,20 @@
 #pragma once
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
+#include <type_traits>
 #include <utility>
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <concepts>
 
 class MachineStack
 {
-public:
 	using ptr_t = std::unique_ptr<const IOperand>;
+public:
 // stack instructions 
 	void push(eOperandType type, std::string value);
-	void push(std::unique_ptr<const IOperand> operand);
+	void push(ptr_t operand);
 	void pop();
 	void dump() const;
 	void assert(eOperandType type, std::string value);
@@ -23,7 +25,6 @@ public:
 	void div();
 	void mod();
 	void print() const;
-	void exec();
 
 // ctors, dtors
 	MachineStack() = default;
@@ -33,11 +34,9 @@ public:
 	MachineStack& operator= (MachineStack&& other);
 	~MachineStack() = default;
 
-// private:
+private:
 	std::pair<ptr_t, ptr_t> pop_two();
-// member fields 
-	std::vector<ptr_t> vs;
-	// ValueStack vs;
+	std::vector<ptr_t> values;
 };
 
 std::ostream& operator<< (std::ostream& out, eOperandType type);
