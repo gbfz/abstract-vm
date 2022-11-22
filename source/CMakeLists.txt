@@ -14,8 +14,6 @@ link_libraries(gmpxx gmp)
 
 add_executable(avm
 	OperandFactory.cpp
-	InstructionStack.cpp
-	ValueStack.cpp
 	MachineStack.cpp
 	main.cpp
 )
