@@ -10,17 +10,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 add_compile_options(-g -Wall -Wextra -Werror -std=c++20)
 
+link_libraries(gmpxx gmp)
+
 add_executable(avm
-	addIntegral.cpp
-	addFloating.cpp
-	mulIntegral.cpp
-	mulFloating.cpp
-	makeFloatStrings.cpp
+	OperandFactory.cpp
 	main.cpp
 )
-
-#add_executable(makeAst
-#	Node.cpp
-#	Parser.cpp
-#	test.cpp
-#)
