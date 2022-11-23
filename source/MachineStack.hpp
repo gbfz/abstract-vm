@@ -1,30 +1,26 @@
 #pragma once
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
-#include <type_traits>
-#include <utility>
-#include <iostream>
-#include <unordered_map>
+#include <stdexcept>
+#include <sstream>
 #include <vector>
-#include <concepts>
+#include <iostream>
 
 class MachineStack
 {
-	using ptr_t = std::unique_ptr<const IOperand>;
+using ptr_t = std::unique_ptr<const IOperand>;
 public:
 // stack instructions 
 	void push(eOperandType type, std::string value);
-	void push(ptr_t operand);
-	void pop();
-	void dump() const;
+	ptr_t pop();
+	void dump(std::ostream& out = std::cout) const;
 	void assert(eOperandType type, std::string value);
-	void assert();
 	void add();
 	void sub();
 	void mul();
 	void div();
 	void mod();
-	void print() const;
+	void print(std::ostream& out = std::cout) const;
 
 // ctors, dtors
 	MachineStack() = default;
@@ -35,7 +31,11 @@ public:
 	~MachineStack() = default;
 
 private:
+// utils 
+	void push(ptr_t operand);
 	std::pair<ptr_t, ptr_t> pop_two();
+
+// fields 
 	std::vector<ptr_t> values;
 };
 

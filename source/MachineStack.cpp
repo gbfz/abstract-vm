@@ -1,8 +1,5 @@
 #include "MachineStack.hpp"
-#include "IOperand.hpp"
-#include <exception>
 #include <string>
-#include <sstream>
 
 MachineStack& MachineStack::operator=(MachineStack&& other)
 {
@@ -26,10 +23,10 @@ void MachineStack::push(eOperandType type, std::string value)
 void MachineStack::push(std::unique_ptr<const IOperand> operand)
 { values.emplace_back(std::move(operand)); }
 
-void MachineStack::dump() const
+void MachineStack::dump(std::ostream& out) const
 {
 	for (auto&& operand : values)
-		std::cout << operand->getType() << "(" << operand->toString() << ")\n";
+		out << operand->getType() << "(" << operand->toString() << ")\n";
 }
 
 void MachineStack::assert(eOperandType type, std::string value)
@@ -38,15 +35,13 @@ void MachineStack::assert(eOperandType type, std::string value)
 	std::stringstream s;
 	if (lhs.getType() != type)
 	{
-		s << "Type mismatch in assert. "
-		  << "Expected '" << type
+		s << "Type mismatch in assert. " << "Expected '" << type
 		  << "', got '" << lhs.getType() << "'";
 		throw std::runtime_error(s.str());
 	}
 	if (lhs.toString() != value)
 	{
-		s << "Value mismatch in assert. "
-		  << "Expected '" << value
+		s << "Value mismatch in assert. " << "Expected '" << value
 		  << "', got '" << lhs.toString() << "'";
 		throw std::runtime_error(s.str());
 	}
@@ -86,30 +81,31 @@ void MachineStack::mod()
 	values.emplace_back(*rhs % *lhs);
 }
 
-void MachineStack::print() const
+void MachineStack::print(std::ostream& out) const
 {
 	const auto& operand = *values.back();
 	if (operand.getType() != eOperandType::Int8)
 		throw std::runtime_error("Printing value whose type isn't Int8");
 	unsigned char value = std::stoi(operand.toString());
-	std::cout << value << '\n';
+	out << value << '\n';
 }
 
-void MachineStack::pop()
+std::unique_ptr<const IOperand> MachineStack::pop()
 {
 	if (values.size() == 0)
 		throw std::runtime_error("Attempt to pop empty stack");
+	auto operand = std::move(values.back());
 	values.pop_back();
+	return operand;
 }
 
-std::pair<std::unique_ptr<const IOperand>, std::unique_ptr<const IOperand>>
+std::pair<std::unique_ptr<const IOperand>,
+		  std::unique_ptr<const IOperand>>
 MachineStack::pop_two()
 {
 	if (values.size() < 2)
 		throw std::runtime_error("Not enough operands on stack");
-	auto rhs = std::move(values.back()); values.pop_back();
-	auto lhs = std::move(values.back()); values.pop_back();
-	return { std::move(rhs), std::move(lhs) };
+	return { pop(), pop() };
 }
 
 std::ostream& operator<< (std::ostream& out, eOperandType type)

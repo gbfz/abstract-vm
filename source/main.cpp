@@ -38,7 +38,21 @@ void testMachine()
 	sa.dump();
 }
 
+void test2()
+{
+	using enum eOperandType;
+	MachineStack sa;
+	sa.push(Int8, "42");
+	sa.push(Double, "0.211111");
+	sa.pop();
+	sa.pop();
+	sa.push(Int8, "227");
+	sa.print();
+	// sa.dump(std::cout);
+}
+
 int main()
 {
-	testMachine();
+	// testMachine();
+	test2();
 }
