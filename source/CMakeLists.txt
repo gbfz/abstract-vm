@@ -16,5 +16,7 @@ link_libraries(gmpxx gmp)
 add_executable(avm
 	OperandFactory.cpp
 	MachineStack.cpp
+	Exceptions.cpp
+	ArithmeticExceptions.cpp
 	main.cpp
 )

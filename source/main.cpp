@@ -46,13 +46,32 @@ void test2()
 	sa.push(Double, "0.211111");
 	sa.pop();
 	sa.pop();
-	sa.push(Int8, "227");
-	sa.print();
-	// sa.dump(std::cout);
+	sa.push(Int32, "227");
+	// sa.print();
+	// sa.dump();
+	try {
+		sa.assert(Int16, "227");
+	} catch (std::exception& e) {
+		std::cerr << e.what() << '\n';
+	}
+}
+
+void test3()
+{
+	using enum eOperandType;
+	MachineStack sa;
+	sa.push(Float, "10.123456987654323456789");
+	sa.push(Float, "387324234.123456789123456789123456789123456789");
+	try {
+		sa.mod();
+	} catch (std::exception& e) {
+		std::cerr << e.what() << '\n';
+	}
 }
 
 int main()
 {
 	// testMachine();
-	test2();
+	// test2();
+	test3();
 }

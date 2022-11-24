@@ -1,10 +1,9 @@
 #pragma once
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
-#include <gmp.h>
+#include "ArithmeticExceptions.hpp"
 #include <gmpxx.h>
-#include <string>
-#include <stdexcept>
+#include <gmp.h>
 
 template <eOperandType Type>
 class Operand final : virtual public IOperand
@@ -26,7 +25,7 @@ public:
 	std::unique_ptr<const IOperand> operator% (const IOperand& rhs) const override
 	{
 		if (isFloatOperation(rhs))
-			throw std::runtime_error("Modulo not supported for fractions");
+			throw ft::modulo_with_fractions_exception();
 		return operate<mpz_class>(rhs, mpz_mod);
 	}
 
@@ -48,7 +47,7 @@ private:
 		gmpT result;
 		func(get_mp_t(result), get_mp_t(a), get_mp_t(b));
 		if (didOverflow(result, type))
-			throw std::runtime_error("Overflow!");
+			throw ft::overflow_exception();
 		return OperandFactory::createOperand(type, toString(result));
 	}
 
@@ -96,8 +95,8 @@ private:
 			case Int32: return r < lim<int32_t>::min() || r > lim<int32_t>::max();
 			case Float: return r < lim<float>::lowest() || r > lim<float>::max();
 			case Double: return r < lim<double>::lowest() || r > lim<double>::max();
-			default: throw std::runtime_error("Type unsupported");
 		}
+		throw std::logic_error("Unsupported type in overflow check");
 	}
 
 public:
@@ -125,7 +124,6 @@ public:
 			case Int32:  return 32;
 			case Float:  return 32;
 			case Double: return 64;
-			default: throw std::runtime_error("Type unsupported");
 		}
 	}
 

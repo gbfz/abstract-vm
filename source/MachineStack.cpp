@@ -1,5 +1,8 @@
 #include "MachineStack.hpp"
-#include <string>
+#include "Exceptions.hpp"
+
+MachineStack::MachineStack(MachineStack&& other) : values()
+{ *this = std::move(other); }
 
 MachineStack& MachineStack::operator=(MachineStack&& other)
 {
@@ -10,9 +13,6 @@ MachineStack& MachineStack::operator=(MachineStack&& other)
 	other.values.clear();
 	return *this;
 }
-
-MachineStack::MachineStack(MachineStack&& other) : values()
-{ *this = std::move(other); }
 
 void MachineStack::push(eOperandType type, std::string value)
 {
@@ -34,17 +34,9 @@ void MachineStack::assert(eOperandType type, std::string value)
 	const auto& lhs = *values.back();
 	std::stringstream s;
 	if (lhs.getType() != type)
-	{
-		s << "Type mismatch in assert. " << "Expected '" << type
-		  << "', got '" << lhs.getType() << "'";
-		throw std::runtime_error(s.str());
-	}
+		throw ft::type_assert_exception(type, lhs.getType());
 	if (lhs.toString() != value)
-	{
-		s << "Value mismatch in assert. " << "Expected '" << value
-		  << "', got '" << lhs.toString() << "'";
-		throw std::runtime_error(s.str());
-	}
+		throw ft::value_assert_exception(value, lhs.toString());
 }
 
 void MachineStack::add()
@@ -69,7 +61,7 @@ void MachineStack::div()
 {
 	auto [lhs, rhs] = pop_two();
 	if (rhs->toString().find_first_not_of(".0") == std::string::npos)
-		throw std::runtime_error("Division by zero");
+		throw ft::div_by_zero_exception();
 	values.emplace_back(*rhs / *lhs);
 }
 
@@ -77,7 +69,7 @@ void MachineStack::mod()
 {
 	auto [lhs, rhs] = pop_two();
 	if (rhs->toString().find_first_not_of(".0") == std::string::npos)
-		throw std::runtime_error("Taking modulo of zero");
+		throw ft::mod_by_zero_exception();
 	values.emplace_back(*rhs % *lhs);
 }
 
@@ -85,7 +77,7 @@ void MachineStack::print(std::ostream& out) const
 {
 	const auto& operand = *values.back();
 	if (operand.getType() != eOperandType::Int8)
-		throw std::runtime_error("Printing value whose type isn't Int8");
+		throw ft::print_exception();
 	unsigned char value = std::stoi(operand.toString());
 	out << value << '\n';
 }
@@ -93,7 +85,7 @@ void MachineStack::print(std::ostream& out) const
 std::unique_ptr<const IOperand> MachineStack::pop()
 {
 	if (values.size() == 0)
-		throw std::runtime_error("Attempt to pop empty stack");
+		throw ft::pop_exception();
 	auto operand = std::move(values.back());
 	values.pop_back();
 	return operand;
@@ -104,7 +96,7 @@ std::pair<std::unique_ptr<const IOperand>,
 MachineStack::pop_two()
 {
 	if (values.size() < 2)
-		throw std::runtime_error("Not enough operands on stack");
+		throw ft::pop_two_exception();
 	return { pop(), pop() };
 }
 
