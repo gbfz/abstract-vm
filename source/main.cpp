@@ -1,6 +1,7 @@
 #include "IOperand.hpp"
 #include "Operand.hpp"
 #include "MachineStack.hpp"
+#include "Parse.hpp"
 #include <iostream>
 #include <ostream>
 
@@ -69,9 +70,18 @@ void test3()
 	}
 }
 
+void testParse()
+{
+	std::string i = "push(14)\nexit";
+	MachineStack s;
+	auto begin = i.begin();
+	bool b = ft::parser::parse_assembly(begin, i.end(), s);
+	std::cout << std::boolalpha << b << '\n';
+}
+
 int main()
 {
 	// testMachine();
 	// test2();
-	test3();
+	// test3();
 }
