@@ -39,6 +39,11 @@ void MachineStack::assert(eOperandType type, std::string value)
 		throw ft::value_assert_exception(value, lhs.toString());
 }
 
+void MachineStack::assert(std::unique_ptr<const IOperand> op)
+{
+	assert(op->getType(), op->toString());
+};
+
 void MachineStack::add()
 {
 	auto [lhs, rhs] = pop_two();

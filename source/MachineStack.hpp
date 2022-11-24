@@ -12,9 +12,11 @@ using ptr_t = std::unique_ptr<const IOperand>;
 public:
 // stack instructions 
 	void push(eOperandType type, std::string value);
+	void push(ptr_t operand);
 	ptr_t pop();
 	void dump(std::ostream& out = std::cout) const;
 	void assert(eOperandType type, std::string value);
+	void assert(ptr_t operand);
 	void add();
 	void sub();
 	void mul();
@@ -32,7 +34,6 @@ public:
 
 private:
 // utils 
-	void push(ptr_t operand);
 	std::pair<ptr_t, ptr_t> pop_two();
 
 // fields 
