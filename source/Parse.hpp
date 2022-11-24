@@ -9,7 +9,7 @@ namespace ft::parser {
 namespace x3 = boost::spirit::x3;
 
 template <class Iter>
-bool parse(Iter& begin, Iter end, MachineStack& stack)
+bool parse(Iter& begin, Iter end, MachineStack& stack, bool isatty = false)
 {
 	// TODO check overflow
 	auto create_operand = [](auto&& ctx)
@@ -40,33 +40,31 @@ bool parse(Iter& begin, Iter end, MachineStack& stack)
 	const auto Z = x3::rule<class Z, std::string> {"Z"} = -x3::char_('-') >> +x3::digit >> '.' >> +x3::digit;
 
 	const auto value = x3::rule<class value, std::vector<std::string>> {"value"} =
-					   x3::string("int8")   >> "(" >> N >> ")"
-					 | x3::string("int16")  >> "(" >> N >> ")"
-					 | x3::string("int32")  >> "(" >> N >> ")"
-					 | x3::string("float")  >> "(" >> Z >> ")"
-					 | x3::string("double") >> "(" >> Z >> ")";
+					  (x3::string("int8")   >> "(" >> N >> ")")
+					| (x3::string("int16")  >> "(" >> N >> ")")
+					| (x3::string("int32")  >> "(" >> N >> ")")
+					| (x3::string("float")  >> "(" >> Z >> ")")
+					| (x3::string("double") >> "(" >> Z >> ")");
 
-	const auto instr = x3::rule<class instr> {"instr"} =
-					 ( "push"   >> value	[_push]
-					 | "assert" >> value	[_assert]
-					 | x3::lit("pop")		[_pop]
-					 | x3::lit("dump")  	[_dump]
-					 | x3::lit("add")		[_add]
-					 | x3::lit("sub")		[_sub]
-					 | x3::lit("mul")		[_mul]
-					 | x3::lit("div")		[_div]
-					 | x3::lit("mod")		[_mod]
-					 | x3::lit("print")		[_print]
-					 ) >> *(';' >> *x3::char_);
+	const auto instr = ( ("push"   >> value)	[_push]
+					   | ("assert" >> value)	[_assert]
+					   | x3::lit("pop")			[_pop]
+					   | x3::lit("dump")  		[_dump]
+					   | x3::lit("add")			[_add]
+					   | x3::lit("sub")			[_sub]
+					   | x3::lit("mul")			[_mul]
+					   | x3::lit("div")			[_div]
+					   | x3::lit("mod")			[_mod]
+					   | x3::lit("print")		[_print]
+					   ) >> *(';' >> *x3::char_);
 
-	const auto sep		  = x3::rule<class sep> {"sep"}				  = +x3::char_('\n');
-	const auto app		  = x3::rule<class app> {"app"} 			  = instr >> *(sep >> instr);
-	const auto read_file  = x3::rule<class read_file> {"read_file"}	  = app >> sep >> "exit";
-	// const auto read_stdin = x3::rule<class read_stdin> {"read_stdin"} = read_file >> sep >> ";;";
+	const auto sep		  = +x3::char_('\n');
+	const auto app		  = instr >> *(sep >> instr);
+	const auto read_file  = +app >> "exit";
 
 	bool b = x3::phrase_parse(begin, end, read_file, x3::space);
-	// bool b = x3::phrase_parse(begin, end, app, x3::space);
-	if (begin != end)
+	if (!b)
+	// if (begin != end)
 		return false;
 	return b;
 }
