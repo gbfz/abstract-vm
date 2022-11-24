@@ -72,8 +72,22 @@ void test3()
 
 void testParse()
 {
-	// std::string i = "push int8(0)\ndump\nexit";
-	std::string i = "push int8(0)\nexit\n";
+	/*
+	std::string s;
+	MachineStack stack;
+	while (std::getline(std::cin, s))
+	{
+		if (s == "q" || s == "Q")
+			break;
+		auto begin = s.begin();
+		bool b = ft::parser::parse(begin, s.end(), stack);
+		if (!b || begin != s.end())
+			std::cout << "Error at: " << std::string(begin, s.end()) << '\n';
+	}
+	*/
+	// /*
+	std::string i = "push int8(0)\ndump\nexit";
+	// std::string i = "push int8(0)";
 	MachineStack s;
 	auto begin = i.begin();
 	bool b = ft::parser::parse(begin, i.end(), s);
@@ -83,6 +97,7 @@ void testParse()
 		std::cout << '\n';
 		std::cout << std::string(begin, i.end()) << '\n';
 	}
+	// */
 }
 
 int main()
