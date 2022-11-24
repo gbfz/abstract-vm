@@ -72,11 +72,17 @@ void test3()
 
 void testParse()
 {
-	std::string i = "push(14)\nexit";
+	// std::string i = "push int8(0)\ndump\nexit";
+	std::string i = "push int8(0)\nexit\n";
 	MachineStack s;
 	auto begin = i.begin();
-	bool b = ft::parser::parse_assembly(begin, i.end(), s);
+	bool b = ft::parser::parse(begin, i.end(), s);
 	std::cout << std::boolalpha << b << '\n';
+	if (begin != i.end())
+	{
+		std::cout << '\n';
+		std::cout << std::string(begin, i.end()) << '\n';
+	}
 }
 
 int main()
@@ -84,4 +90,5 @@ int main()
 	// testMachine();
 	// test2();
 	// test3();
+	testParse();
 }
