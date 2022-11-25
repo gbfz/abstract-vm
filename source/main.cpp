@@ -101,7 +101,7 @@ void test3()
 
 void testParse()
 {
-	std::string input = "add\npush int8(0)\ndump\n";
+	std::string input = "add\n\n\npush int8(0)\ndump";
 	// std::string input = "dump\ndump";
 	auto begin = input.begin(), end = input.end();
 	std::vector<std::string> acc;
