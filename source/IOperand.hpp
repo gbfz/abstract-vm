@@ -1,15 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
-
-enum class eOperandType : int8_t
-{
-	Int8,
-	Int16,
-	Int32,
-	Float,
-	Double,
-};
+#include "eOperandType.hpp"
 
 class IOperand
 {

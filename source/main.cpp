@@ -1,7 +1,7 @@
 #include "IOperand.hpp"
 #include "Operand.hpp"
 #include "MachineStack.hpp"
-#include "Parse.hpp"
+#include "2Parse.hpp"
 #include <iostream>
 #include <ostream>
 
@@ -70,38 +70,46 @@ void test3()
 	}
 }
 
+// void testParse()
+// {
+// 	// /*
+// 	std::string s;
+// 	MachineStack stack;
+// 	while (std::getline(std::cin, s))
+// 	{
+// 		if (s == "q" || s == "Q")
+// 			break;
+// 		auto begin = s.begin();
+// 		bool b = ft::parser::parse(begin, s.end(), stack, true);
+// 		if (!b)
+// 			std::cout << "Error at: " << std::string(begin, s.end()) << '\n';
+// 	}
+// 	// */
+// 	/*
+// 	std::string i = "push int8(0)\ndump\npush int8(10)\nadd\ndump\nexit";
+// 	// std::string i = "push int8(0)";
+// 	MachineStack s;
+// 	auto begin = i.begin();
+// 	bool b = ft::parser::parse(begin, i.end(), s);
+// 	if (!b)
+// 	{
+// 		std::cout << '\n';
+// 		std::cout << std::string(begin, i.end()) << '\n';
+// 	}
+// 	*/
+// }
+
 void testParse()
 {
-	// /*
-	std::string s;
-	MachineStack stack;
-	while (std::getline(std::cin, s))
-	{
-		if (s == "q" || s == "Q")
-			break;
-		auto begin = s.begin();
-		bool b = ft::parser::parse(begin, s.end(), stack, true);
-		if (!b)
-			std::cout << "Error at: " << std::string(begin, s.end()) << '\n';
-	}
-	// */
-	/*
-	std::string i = "push int8(0)\n\
-					 dump\n\
-					 push int8(10)\n\
-					 add\n\
-					 dump\n\
-					 exit";
-	// std::string i = "push int8(0)";
-	MachineStack s;
-	auto begin = i.begin();
-	bool b = ft::parser::parse(begin, i.end(), s);
-	if (!b)
-	{
-		std::cout << '\n';
-		std::cout << std::string(begin, i.end()) << '\n';
-	}
-	*/
+	std::string input = "add\npush int8(0)\ndump\n";
+	// std::string input = "dump\ndump";
+	auto begin = input.begin(), end = input.end();
+	std::vector<std::string> acc;
+	auto parse_ok = avm::parser::parse_string(begin, end, acc);
+	if (!parse_ok)
+		std::cout << "Error at: " << std::string(begin, end) << '\n';
+	else for (auto&& s : acc)
+		std::cout << s << '\n';
 }
 
 int main()
