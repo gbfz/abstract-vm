@@ -1,7 +1,9 @@
 #pragma once
 #include <boost/spirit/home/x3.hpp>
+#include <iostream>
 #include <vector>
 #include <string>
+#include <gmpxx.h>
 
 namespace avm::parser {
 
@@ -29,17 +31,19 @@ struct push_back
 template <std::integral numT>
 bool fits_impl(const std::string& s)
 {
-	auto min = std::to_string(std::numeric_limits<numT>::min());
-	auto max = std::to_string(std::numeric_limits<numT>::max());
-	return s >= min && s <= max;
+	static const auto min = mpz_class(std::numeric_limits<numT>::min());
+	static const auto max = mpz_class(std::numeric_limits<numT>::max());
+	auto num = mpz_class(s);
+	return num >= min && num <= max;
 }
 
 template <std::floating_point numT>
 bool fits_impl(const std::string& s)
 {
-	auto min = std::to_string(std::numeric_limits<numT>::lowest());
-	auto max = std::to_string(std::numeric_limits<numT>::max());
-	return s >= min && s <= max;
+	static const auto min = mpf_class(std::numeric_limits<numT>::min());
+	static const auto max = mpf_class(std::numeric_limits<numT>::max());
+	auto num = mpf_class(s);
+	return num >= min && num <= max;
 }
 
 template <typename numT>

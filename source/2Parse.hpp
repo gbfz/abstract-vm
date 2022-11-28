@@ -41,18 +41,35 @@ const auto instr = make_rule<std::vector<std::string>>() =
 
 const auto sep = +x3::char_('\n');
 
-const auto S          = make_rule<std::vector<std::string>>()          = instr % sep;
-// const auto read_file  = x3::rule<class read_file, std::vector<std::string>> {"read_file"}  = S >> "exit";
-// const auto read_stdin = x3::rule<class read_file, std::vector<std::string>> {"read_stdin"} = read_file >> ";;";
+const auto S          = make_rule<std::vector<std::string>>() = instr % sep;
+const auto read_file  = make_rule<std::vector<std::string>>() = +S >> sep >> "exit";
+const auto read_stdin = make_rule<std::vector<std::string>>() = read_file >> sep >> ";;";
 // BUT actually it all should produce a vector of tokens that i'd later consume without boost::spirit
 
 template <class Iter>
 bool parse_string(Iter& begin, Iter end, std::vector<std::string>& acc)
 {
-	// auto parse_ok = x3::parse(begin, end, S, acc);
 	auto parse_ok = x3::phrase_parse(begin, end, S, x3::char_(' ', '\t'), acc);
 	if (begin != end)
 		return false;
+	return parse_ok;
+}
+
+template <class Iter>
+bool parse_file(Iter& begin, Iter end, std::vector<std::string>& acc)
+{
+	auto parse_ok = x3::phrase_parse(begin, end, read_file, x3::char_(' ', '\t'), acc);
+	if (begin != end)
+		return false;
+	return parse_ok;
+}
+
+template <class Iter>
+bool parse_stdin(Iter& begin, Iter end, std::vector<std::string>& acc)
+{
+	auto parse_ok = x3::phrase_parse(begin, end, read_stdin, x3::char_(' ', '\t'), acc);
+	// if (begin != end)
+		// return false;
 	return parse_ok;
 }
 
