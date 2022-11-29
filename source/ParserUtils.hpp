@@ -1,9 +1,8 @@
 #pragma once
 #include <boost/spirit/home/x3.hpp>
-#include <iostream>
+#include "OverflowCheck.hpp"
 #include <vector>
 #include <string>
-#include <gmpxx.h>
 
 namespace avm::parser {
 
@@ -28,24 +27,6 @@ struct push_back
 	}
 };
 
-template <std::integral numT>
-bool fits_impl(const std::string& s)
-{
-	static const auto min = mpz_class(std::numeric_limits<numT>::min());
-	static const auto max = mpz_class(std::numeric_limits<numT>::max());
-	auto num = mpz_class(s);
-	return num >= min && num <= max;
-}
-
-template <std::floating_point numT>
-bool fits_impl(const std::string& s)
-{
-	static const auto min = mpf_class(std::numeric_limits<numT>::min());
-	static const auto max = mpf_class(std::numeric_limits<numT>::max());
-	auto num = mpf_class(s);
-	return num >= min && num <= max;
-}
-
 template <typename numT>
 struct push_if_fits
 {
@@ -60,11 +41,5 @@ struct push_if_fits
 		else x3::_pass(ctx) = false;
 	}
 };
-
-template <class T>
-auto make_rule(const char* name = "")
-{
-	return x3::rule<T, T> {name};
-}
 
 }

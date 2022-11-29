@@ -1,6 +1,7 @@
 #pragma once
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
+#include "OverflowCheck.hpp"
 #include "ArithmeticExceptions.hpp"
 #include <gmpxx.h>
 #include <gmp.h>
@@ -85,16 +86,17 @@ private:
 	template <class T>
 	using lim = std::numeric_limits<T>;
 
-	bool didOverflow(const auto& r, eOperandType type) const
+	template <class T>
+	bool didOverflow(const T& r, eOperandType type) const
 	{
 		using enum eOperandType;
 		switch (type)
 		{
-			case Int8: return r < lim<int8_t>::min() || r > lim<int8_t>::max();
-			case Int16: return r < lim<int16_t>::min() || r > lim<int16_t>::max();
-			case Int32: return r < lim<int32_t>::min() || r > lim<int32_t>::max();
-			case Float: return r < lim<float>::lowest() || r > lim<float>::max();
-			case Double: return r < lim<double>::lowest() || r > lim<double>::max();
+			case Int8:   return avm::fits_impl<int8_t>(r);
+			case Int16:  return avm::fits_impl<int16_t>(r);
+			case Int32:  return avm::fits_impl<int32_t>(r);
+			case Float:  return avm::fits_impl<float>(r);
+			case Double: return avm::fits_impl<double>(r);
 		}
 		throw std::logic_error("Unsupported type in overflow check");
 	}

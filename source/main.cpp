@@ -5,6 +5,7 @@
 #include <iostream>
 #include <ostream>
 #include <sstream>
+#include <vector>
 
 void testParse()
 {
@@ -37,6 +38,27 @@ void testLoop()
 		std::cout << s << '\n';
 }
 
+void testStream()
+{
+	std::stringstream sstream;
+	std::string buf;
+	while (std::getline(std::cin, buf))
+		sstream << buf << '\n';
+	std::vector<std::string> acc;
+	while (std::getline(sstream, buf))
+	{
+		auto begin = buf.begin(), end = buf.end();
+		bool parse_ok = avm::parser::parse_string(begin, end, acc);
+		if (!parse_ok)
+		{
+			std::cout << "Error at: " << std::string(begin, end) << '\n';
+			exit(21);
+		}
+	}
+	for (auto&& s : acc)
+		std::cout << s << '\n';
+}
+
 int main()
 {
 	// testMachine();
@@ -44,4 +66,5 @@ int main()
 	// test3();
 	// testParse();
 	testLoop();
+	// testStream();
 }
