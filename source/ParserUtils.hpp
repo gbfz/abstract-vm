@@ -2,6 +2,7 @@
 #include <boost/spirit/home/x3.hpp>
 #include "OverflowCheck.hpp"
 #include <vector>
+#include <list>
 #include <string>
 
 namespace avm::parser {
@@ -12,7 +13,7 @@ struct push_back_each
 {
 	void operator() (auto& ctx)
 	{
-		auto vec = boost::get<std::vector<std::string>>(x3::_attr(ctx));
+		auto vec = boost::get<std::list<std::string>>(x3::_attr(ctx));
 		for (auto& s : vec)
 			x3::_val(ctx).emplace_back(std::move(s));
 	}

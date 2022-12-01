@@ -11,15 +11,16 @@ const x3::rule<class sep> sep = "sep";
 const x3::rule<class comment> comment = "comment";
 
 const auto sep_def     = +x3::char_('\n');
-const auto comment_def = *x3::space >> ';' >> -(x3::char_ - ';') >> *x3::char_;
+// const auto comment_def = *x3::space >> ';' >> (x3::char_ - ';') >> *x3::char_;
+const auto comment_def = *x3::space >> ';' >> *x3::char_;
 
-const x3::rule<class N, std::string> N = "N";
-const x3::rule<class Z, std::string> Z = "Z";
-const x3::rule<class value,  std::vector<std::string>> value = "value";
-const x3::rule<class push,   std::vector<std::string>> push = "push";
-const x3::rule<class assert, std::vector<std::string>> assert = "assert";
-const x3::rule<class instr,  std::vector<std::string>> instr = "instr";
-const x3::rule<class S,      std::vector<std::string>> S = "S";
+const x3::rule<class N,      std::string> N = "N";
+const x3::rule<class Z,      std::string> Z = "Z";
+const x3::rule<class value,  std::list<std::string>> value = "value";
+const x3::rule<class push,   std::list<std::string>> push = "push";
+const x3::rule<class assert, std::list<std::string>> assert = "assert";
+const x3::rule<class instr,  std::list<std::string>> instr = "instr";
+const x3::rule<class S,      std::list<std::string>> S = "S";
 
 const auto N_def      = -x3::char_('-') >> +x3::digit;
 const auto Z_def      = -x3::char_('-') >> +x3::digit >> x3::char_('.') >> +x3::digit;
@@ -42,15 +43,14 @@ const auto instr_def  = (push | assert)      [push_back_each()]
 					  |  x3::string("div")
 					  |  x3::string("mod")
 					  |  x3::string("print")
-					  |  x3::string("exit")) [push_back()]
-					  >> *comment;
+					  |  x3::string("exit")) [push_back()];
 
-const auto S_def = instr % sep;
+const auto S_def = (instr >> -comment) % sep;
 
 BOOST_SPIRIT_DEFINE(comment, sep, N, Z, value, push, assert, instr, S);
 
 template <class Iter>
-bool parse_string(Iter& begin, Iter end, std::vector<std::string>& acc)
+bool parse_string(Iter& begin, Iter end, std::list<std::string>& acc)
 {
 	auto parse_ok = x3::phrase_parse(begin, end, S, x3::char_(' ', '\t'), acc);
 	if (begin != end)
