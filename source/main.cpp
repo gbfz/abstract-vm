@@ -95,9 +95,21 @@ void work(char* filename)
 	}
 }
 
+void usage();
+
 int main(int ac, char** av)
 {
 	if (ac == 1)
 		work();
-	else work(av[1]);
+	else if (ac == 2)
+	{
+		std::string arg = av[1];
+		if (arg == "-h" || arg == "--help")
+		{
+			usage();
+			return 0;
+		}
+	   	work(av[1]);
+	}
+	else usage();
 }

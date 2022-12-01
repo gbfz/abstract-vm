@@ -28,6 +28,7 @@ add_executable(avm
 	ArithmeticExceptions.cpp
 	c_string.cpp
 	InputLoop.cpp
+	usage.cpp
 	main.cpp
 )
 target_link_libraries(avm liblinenoise)

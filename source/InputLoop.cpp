@@ -1,5 +1,6 @@
 #include "InputLoop.hpp"
 #include "Reader.hpp"
+#include <iostream>
 #include <fstream>
 #include <string>
 

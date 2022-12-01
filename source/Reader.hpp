@@ -1,13 +1,10 @@
 #pragma once
 #include "linenoise/linenoise.h"
-#include <fstream>
-#include <string>
 #include "c_string.hpp"
 #include <algorithm>
+#include <fstream>
+#include <string>
 #include <list>
-
-#include <iostream>
-#include <type_traits>
 
 namespace avm {
 
@@ -19,10 +16,10 @@ enum class inputSource {
 template <inputSource source>
 struct Reader;
 
-struct sentinel {};
+struct read_sentinel {};
 
 template <inputSource source>
-class iterator
+class read_iterator
 {
 private:
 	Reader<source>& parent;
@@ -30,15 +27,20 @@ private:
 	strT input;
 	size_t cur_line = 0;
 public:
-	iterator(Reader<source>& p) : parent(p), input(p.getInput()) {}
+	read_iterator(Reader<source>& p) : parent(p), input(p.getInput()) {}
+	read_iterator(const read_iterator&) = delete;
+	read_iterator& operator= (const read_iterator&) = delete;
+	read_iterator(read_iterator&&) = delete;
+	read_iterator& operator= (read_iterator&&) = delete;
 
-	bool operator== (sentinel) const
+	bool operator== (read_sentinel) const
 	{
 		if constexpr(source == inputSource::tty)
 			return input == ";;";
 		else return input == "exit";
 	}
-	iterator& operator++ ()
+
+	read_iterator& operator++ ()
 	{
 		if constexpr(source == inputSource::file)
 			if (++cur_line > parent.max_lines)
@@ -46,8 +48,8 @@ public:
 		input = parent.getInput();
 		return *this;
 	}
-	strT operator* () const
-	{ return input; }
+
+	strT operator* () const { return input; }
 };
 
 template <>
@@ -62,8 +64,8 @@ struct Reader<inputSource::tty>
 		return std::make_pair(true, "");
 	}
 
-	iterator<inputSource::tty> begin() { return {*this}; }
-	sentinel end() { return {}; }
+	read_iterator<inputSource::tty> begin() { return {*this}; }
+	read_sentinel end() { return {}; }
 };
 
 template <>
@@ -78,11 +80,11 @@ struct Reader<inputSource::file>
 		std::getline(stream, buf);
 		return buf;
 	}
-	auto isInputEndValid(const std::list<std::string>&)
-	{ return std::make_pair(true, ""); }
 
-	iterator<inputSource::file> begin() { return {*this}; }
-	sentinel end() { return {}; }
+	auto isInputEndValid(const std::list<std::string>&) { return std::make_pair(true, ""); }
+
+	read_iterator<inputSource::file> begin() { return {*this}; }
+	read_sentinel end() { return {}; }
 
 	Reader() = default;
 	~Reader() = default;
