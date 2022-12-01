@@ -44,8 +44,7 @@ c_string& c_string::operator= (c_string&& other) noexcept
 c_string::~c_string() noexcept { ::free(_ptr); }
 
 size_t c_string::size() const noexcept { return _size; }
-const char* c_string::get() const noexcept { return _ptr; }
-const char* c_string::operator* () const noexcept { return _ptr; }
+const char* c_string::data() const noexcept { return _ptr; }
 
 char* c_string::begin() noexcept { return _ptr; }
 const char* c_string::begin() const noexcept { return _ptr; }

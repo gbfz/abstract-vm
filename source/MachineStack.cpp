@@ -25,8 +25,8 @@ void MachineStack::push(std::unique_ptr<const IOperand> operand)
 
 void MachineStack::dump(std::ostream& out) const
 {
-	for (auto&& operand : values)
-		out << operand->getType() << "(" << operand->toString() << ")\n";
+	for (auto it = values.crbegin(); it != values.crend(); ++it)
+		out << (*it)->toString() << '\n';
 }
 
 void MachineStack::assert(eOperandType type, std::string value)

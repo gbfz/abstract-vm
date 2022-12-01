@@ -11,7 +11,6 @@ const x3::rule<class sep> sep = "sep";
 const x3::rule<class comment> comment = "comment";
 
 const auto sep_def     = +x3::char_('\n');
-// const auto comment_def = *x3::space >> ';' >> (x3::char_ - ';') >> *x3::char_;
 const auto comment_def = *x3::space >> ';' >> *x3::char_;
 
 const x3::rule<class N,      std::string> N = "N";
@@ -45,7 +44,7 @@ const auto instr_def  = (push | assert)      [push_back_each()]
 					  |  x3::string("print")
 					  |  x3::string("exit")) [push_back()];
 
-const auto S_def = (instr >> -comment) % sep;
+const auto S_def = -((instr >> -comment) | comment) % sep;
 
 BOOST_SPIRIT_DEFINE(comment, sep, N, Z, value, push, assert, instr, S);
 

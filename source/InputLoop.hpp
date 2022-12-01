@@ -6,6 +6,7 @@
 
 namespace avm {
 
-std::list<std::string> inputLoop();
+std::list<std::string> readInput();
+std::list<std::string> readInput(std::ifstream file);
 
 }

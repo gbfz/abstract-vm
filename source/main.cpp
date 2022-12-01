@@ -2,6 +2,9 @@
 #include "OperandFactory.hpp"
 #include "eOperandType.hpp"
 #include "InputLoop.hpp"
+#include <fstream>
+#include <functional>
+#include <stdexcept>
 #include <unordered_map>
 #include <exception>
 #include <list>
@@ -9,86 +12,92 @@
 
 eOperandType toEnum(const std::string& t)
 {
-	using enum eOperandType;
 	static const std::unordered_map<std::string, eOperandType> type = {
-		{ "int8",   Int8   },
-		{ "int16",  Int16  },
-		{ "int32",  Int32  },
-		{ "float",  Float  },
-		{ "double", Double },
+		{ "int8",   eOperandType::Int8   },
+		{ "int16",  eOperandType::Int16  },
+		{ "int32",  eOperandType::Int32  },
+		{ "float",  eOperandType::Float  },
+		{ "double", eOperandType::Double },
 	};
 	return type.at(t);
 }
 
-void _push(std::list<std::string>& tokens, MachineStack& stack)
+auto getTwo(std::list<std::string>& tokens)
 {
-	auto type = std::move(tokens.front());
+	auto type = toEnum(std::move(tokens.front()));
 	tokens.pop_front();
-	auto operand_value = std::move(tokens.front());
+	auto value = std::move(tokens.front());
 	tokens.pop_front();
-	stack.push(OperandFactory::createOperand(toEnum(type), operand_value));
+	return std::make_pair(type, value);
+};
+
+auto _push(MachineStack& stack, std::list<std::string>& tokens)
+{
+	auto [type, value] = getTwo(tokens);
+	stack.push(OperandFactory::createOperand(type, std::move(value)));
 }
 
-void _assert(std::list<std::string>& tokens, MachineStack& stack)
+auto _assert(MachineStack& stack, std::list<std::string>& tokens)
 {
-	auto token = std::move(tokens.front());
-	tokens.pop_front();
-	auto operand_value = std::move(tokens.front());
-	tokens.pop_front();
-	stack.assert(toEnum(token), operand_value);
+	auto [type, value] = getTwo(tokens);
+	stack.assert(type, std::move(value));
 }
 
-void _pop(auto&, MachineStack& stack) { stack.pop(); }
-void _add(auto&, MachineStack& stack) { stack.add(); }
-void _sub(auto&, MachineStack& stack) { stack.sub(); }
-void _mul(auto&, MachineStack& stack) { stack.mul(); }
-void _div(auto&, MachineStack& stack) { stack.div(); }
-void _mod(auto&, MachineStack& stack) { stack.mod(); }
-void _dump(auto&, MachineStack& stack) { stack.dump(); }
-void _print(auto&, MachineStack& stack) { stack.print(); }
-void _exit(auto&, MachineStack&) {}
-
-void exec(const auto& handlers)
+void exec(std::list<std::string>& tokens)
 {
 	MachineStack stack;
-	auto tokens = avm::inputLoop();
+
+	std::unordered_map<std::string, std::function<void()>> handlers =
+	{
+		{ "push",   [&] { _push  (stack, tokens); } },
+		{ "assert", [&] { _assert(stack, tokens); } },
+		{ "print",  [&] { stack.print(); } },
+		{ "dump",   [&] { stack.dump(); } },
+		{ "pop",    [&] { stack.pop(); } },
+		{ "add",    [&] { stack.add(); } },
+		{ "sub",    [&] { stack.sub(); } },
+		{ "mul",    [&] { stack.mul(); } },
+		{ "div",    [&] { stack.div(); } },
+		{ "mod",    [&] { stack.mod(); } },
+		{ "exit",   [ ] { } }
+	};
+
 	while (!tokens.empty())
 	{
 		auto instruction = std::move(tokens.front());
-		auto handler = handlers.at(instruction);
 		tokens.pop_front();
-		handler(tokens, stack);
+		handlers.at(instruction)();
 	}
 }
 
-void test1()
+void work()
 {
-	// const auto getTwo = [&]()
-	// {
-	// 	auto type = toEnum(std::move(tokens.front()));
-	// 	tokens.pop_front();
-	// 	auto value = std::move(tokens.front());
-	// 	tokens.pop_front();
-	// 	return std::make_pair(type, value);
-	// };
-
-	static const std::unordered_map<std::string, decltype(&_push)> handlers = {
-		{ "push", _push }, { "assert", _assert },
-		{ "pop" , _pop  }, { "dump"  , _dump   },
-		{ "add" , _add  }, { "sub"   , _sub    },
-		{ "mul" , _mul  }, { "div"   , _div    },
-		{ "mod" , _mod  }, { "print" , _print  },
-		{ "exit", _exit }
-	};
 	try {
-		exec(handlers);
+		auto token_stream = avm::readInput();
+		exec(token_stream);
 	} catch (std::exception& e) {
 		std::cout << e.what() << '\n';
 		exit(21);
 	}
 }
 
-int main()
+void work(char* filename)
 {
-	test1();
+	try {
+		std::ifstream file { filename };
+		if (!file.is_open() || file.bad())
+			throw std::invalid_argument("Cannot open or read given file");
+		auto token_stream = avm::readInput(std::move(file));
+		exec(token_stream);
+	} catch (std::exception& e) {
+		std::cout << e.what() << '\n';
+		exit(21);
+	}
+}
+
+int main(int ac, char** av)
+{
+	if (ac == 1)
+		work();
+	else work(av[1]);
 }
