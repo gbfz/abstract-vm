@@ -42,8 +42,6 @@ std::list<std::string> inputLoop()
 	auto [input_ok, msg] = isInputEndValid(tokens);
 	if (!input_ok)
 		throw std::runtime_error(msg);
-	// for (auto s : tokens)
-		// std::cout << s << '\n';
 	return tokens;
 }
 

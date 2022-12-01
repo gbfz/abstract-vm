@@ -42,12 +42,12 @@ private:
 	template <class gmpT>
 	auto operate(const IOperand& rhs, auto&& func) const
 	{
-		const auto type = this->getCommonType(rhs);
+		auto type = this->getCommonType(rhs);
 		gmpT a { this->toString() };
 		gmpT b { rhs.toString() };
 		gmpT result;
 		func(get_mp_t(result), get_mp_t(a), get_mp_t(b));
-		if (didOverflow(result, type))
+		if (!fits(type, result))
 			throw ft::overflow_exception();
 		return OperandFactory::createOperand(type, toString(result));
 	}
@@ -87,7 +87,7 @@ private:
 	using lim = std::numeric_limits<T>;
 
 	template <class T>
-	bool didOverflow(const T& r, eOperandType type) const
+	bool fits(eOperandType type, const T& r) const
 	{
 		using enum eOperandType;
 		switch (type)
