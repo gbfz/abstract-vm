@@ -1,10 +1,9 @@
 #pragma once
+#include "eOperandType.hpp"
 #include <stdexcept>
 #include <string>
-//#include "eOperandType.hpp"
-#include "IOperand.hpp"
 
-namespace ft {
+namespace avm {
 
 struct value_assert_exception final : public std::exception
 {
@@ -37,6 +36,12 @@ struct pop_two_exception final : public std::exception
 { const char* what() const noexcept override; };
 
 struct print_exception final : public std::exception
+{ const char* what() const noexcept override; };
+
+struct modulo_with_fractions_exception final : public std::exception
+{ const char* what() const noexcept override; };
+
+struct overflow_exception final : public std::exception
 { const char* what() const noexcept override; };
 
 }

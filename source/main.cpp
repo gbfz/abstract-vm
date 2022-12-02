@@ -28,16 +28,16 @@ auto getTwo(std::list<std::string>& tokens)
 	tokens.pop_front();
 	auto value = std::move(tokens.front());
 	tokens.pop_front();
-	return std::make_pair(type, value);
+	return std::make_pair(std::move(type), std::move(value));
 };
 
-auto _push(MachineStack& stack, std::list<std::string>& tokens)
+auto push(MachineStack& stack, std::list<std::string>& tokens)
 {
 	auto [type, value] = getTwo(tokens);
 	stack.push(OperandFactory::createOperand(type, std::move(value)));
 }
 
-auto _assert(MachineStack& stack, std::list<std::string>& tokens)
+auto assert(MachineStack& stack, std::list<std::string>& tokens)
 {
 	auto [type, value] = getTwo(tokens);
 	stack.assert(type, std::move(value));
@@ -49,8 +49,8 @@ void exec(std::list<std::string>& tokens)
 
 	std::unordered_map<std::string, std::function<void()>> handlers =
 	{
-		{ "push",   [&] { _push  (stack, tokens); } },
-		{ "assert", [&] { _assert(stack, tokens); } },
+		{ "push",   [&] { push  (stack, tokens); } },
+		{ "assert", [&] { assert(stack, tokens); } },
 		{ "print",  [&] { stack.print(); } },
 		{ "dump",   [&] { stack.dump(); } },
 		{ "pop",    [&] { stack.pop(); } },
@@ -70,18 +70,19 @@ void exec(std::list<std::string>& tokens)
 	}
 }
 
-void work()
+int work()
 {
 	try {
 		auto token_stream = avm::readInput();
 		exec(token_stream);
 	} catch (std::exception& e) {
 		std::cout << e.what() << '\n';
-		exit(21);
+		return 1;
 	}
+	return 0;
 }
 
-void work(char* filename)
+int work(char* filename)
 {
 	try {
 		std::ifstream file { filename };
@@ -91,25 +92,23 @@ void work(char* filename)
 		exec(token_stream);
 	} catch (std::exception& e) {
 		std::cout << e.what() << '\n';
-		exit(21);
+		return 1;
 	}
+	return 0;
 }
 
-void usage();
+int usage();
 
 int main(int ac, char** av)
 {
 	if (ac == 1)
-		work();
-	else if (ac == 2)
+		return work();
+	if (ac == 2)
 	{
 		std::string arg = av[1];
 		if (arg == "-h" || arg == "--help")
-		{
-			usage();
-			return 0;
-		}
-	   	work(av[1]);
+			return usage();
+	   	return work(av[1]);
 	}
-	else usage();
+	return usage();
 }

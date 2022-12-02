@@ -2,7 +2,7 @@
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
 #include "OverflowCheck.hpp"
-#include "ArithmeticExceptions.hpp"
+#include "Exceptions.hpp"
 #include <gmpxx.h>
 #include <gmp.h>
 
@@ -26,7 +26,7 @@ public:
 	std::unique_ptr<const IOperand> operator% (const IOperand& rhs) const override
 	{
 		if (isFloatOperation(rhs))
-			throw ft::modulo_with_fractions_exception();
+			throw avm::modulo_with_fractions_exception();
 		return operate<mpz_class>(rhs, mpz_mod);
 	}
 
@@ -48,7 +48,7 @@ private:
 		gmpT result;
 		func(get_mp_t(result), get_mp_t(a), get_mp_t(b));
 		if (!fits(type, result))
-			throw ft::overflow_exception();
+			throw avm::overflow_exception();
 		return OperandFactory::createOperand(type, toString(result));
 	}
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.24)
 
 project(avm)
 
@@ -11,24 +11,21 @@ add_link_options(-g)
 
 link_libraries(gmpxx gmp)
 
-add_custom_target(BuildLiblinenoise ALL
-	COMMAND make -C ${CMAKE_SOURCE_DIR}/linenoise
-)
 add_library(liblinenoise STATIC IMPORTED)
+add_custom_target(buildliblinenoise ALL
+	COMMAND make lib
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/linenoise)
 set_target_properties(liblinenoise PROPERTIES
-  IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/linenoise/liblinenoise.a"
-  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/linenoise"
-)
-add_dependencies(liblinenoise BuildLiblinenoise)
+    IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/linenoise/liblinenoise.a"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/linenoise")
+add_dependencies(liblinenoise buildliblinenoise)
 
 add_executable(avm
 	OperandFactory.cpp
 	MachineStack.cpp
 	Exceptions.cpp
-	ArithmeticExceptions.cpp
 	c_string.cpp
 	InputLoop.cpp
 	usage.cpp
-	main.cpp
-)
+	main.cpp)
 target_link_libraries(avm liblinenoise)

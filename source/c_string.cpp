@@ -11,18 +11,22 @@ c_string::c_string(char* ptr) noexcept
 c_string::c_string(const char* ptr)
 	: _ptr(strdup(ptr))
 	, _size(_ptr ? strlen(_ptr) : 0)
-{ if (!_ptr) throw std::bad_alloc(); }
+{
+	if (!_ptr) throw std::bad_alloc();
+}
 
 c_string::c_string(const c_string& other)
 	: _ptr(strdup(other._ptr))
 	, _size(other._size)
-{ if (!_ptr) throw std::bad_alloc(); }
+{
+	if (!_ptr) throw std::bad_alloc();
+}
 
 c_string& c_string::operator= (const c_string& other)
 {
 	char* t = strdup(other._ptr);
 	if (!t) throw std::bad_alloc();
-	::free(_ptr);
+	std::free(_ptr);
 	_ptr = t;
 	_size = other._size;
 	return *this;
@@ -35,13 +39,13 @@ c_string::c_string(c_string&& other) noexcept
 
 c_string& c_string::operator= (c_string&& other) noexcept
 {
-	::free(_ptr);
+	std::free(_ptr);
 	_ptr = std::exchange(other._ptr, nullptr);
 	_size = std::exchange(other._size, 0);
 	return *this;
 }
 
-c_string::~c_string() noexcept { ::free(_ptr); }
+c_string::~c_string() noexcept { std::free(_ptr); }
 
 size_t c_string::size() const noexcept { return _size; }
 const char* c_string::data() const noexcept { return _ptr; }
@@ -67,8 +71,7 @@ std::strong_ordering c_string::operator<=>(const char* other) const
 	return rel <=> 0;
 }
 
-bool c_string::operator== (const char* other) const
-{ return (*this <=> other) == 0; }
+bool c_string::operator== (const char* other) const { return (*this <=> other) == 0; }
 
 std::ostream& c_string::operator<< (std::ostream& out)
 {

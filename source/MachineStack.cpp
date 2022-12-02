@@ -31,12 +31,14 @@ void MachineStack::dump(std::ostream& out) const
 
 void MachineStack::assert(eOperandType type, std::string value)
 {
+	if (values.empty())
+		throw std::runtime_error("Assert on empty stack");
 	const auto& lhs = *values.back();
 	std::stringstream s;
 	if (lhs.getType() != type)
-		throw ft::type_assert_exception(type, lhs.getType());
+		throw avm::type_assert_exception(type, lhs.getType());
 	if (lhs.toString() != value)
-		throw ft::value_assert_exception(value, lhs.toString());
+		throw avm::value_assert_exception(value, lhs.toString());
 }
 
 void MachineStack::assert(std::unique_ptr<const IOperand> op)
@@ -66,7 +68,7 @@ void MachineStack::div()
 {
 	auto [lhs, rhs] = pop_two();
 	if (rhs->toString().find_first_not_of(".0") == std::string::npos)
-		throw ft::div_by_zero_exception();
+		throw avm::div_by_zero_exception();
 	values.emplace_back(*rhs / *lhs);
 }
 
@@ -74,7 +76,7 @@ void MachineStack::mod()
 {
 	auto [lhs, rhs] = pop_two();
 	if (rhs->toString().find_first_not_of(".0") == std::string::npos)
-		throw ft::mod_by_zero_exception();
+		throw avm::mod_by_zero_exception();
 	values.emplace_back(*rhs % *lhs);
 }
 
@@ -82,7 +84,7 @@ void MachineStack::print(std::ostream& out) const
 {
 	const auto& operand = *values.back();
 	if (operand.getType() != eOperandType::Int8)
-		throw ft::print_exception();
+		throw avm::print_exception();
 	unsigned char value = std::stoi(operand.toString());
 	out << value << '\n';
 }
@@ -90,7 +92,7 @@ void MachineStack::print(std::ostream& out) const
 std::unique_ptr<const IOperand> MachineStack::pop()
 {
 	if (values.size() == 0)
-		throw ft::pop_exception();
+		throw avm::pop_exception();
 	auto operand = std::move(values.back());
 	values.pop_back();
 	return operand;
@@ -101,7 +103,7 @@ std::pair<std::unique_ptr<const IOperand>,
 MachineStack::pop_two()
 {
 	if (values.size() < 2)
-		throw ft::pop_two_exception();
+		throw avm::pop_two_exception();
 	return { pop(), pop() };
 }
 

@@ -1,7 +1,7 @@
 #include "Exceptions.hpp"
 #include <unordered_map>
 
-namespace ft {
+namespace avm {
 
 value_assert_exception::value_assert_exception(
 		const std::string& expected,
@@ -46,5 +46,11 @@ const char* pop_two_exception::what() const noexcept
 
 const char* print_exception::what() const noexcept
 { return "Attempt to print value with type other than int8"; }
+
+const char* modulo_with_fractions_exception::what() const noexcept
+{ return "Modulo not supported for fractions"; }
+
+const char* overflow_exception::what() const noexcept
+{ return "Overflow!"; }
 
 }

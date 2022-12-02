@@ -1,8 +1,5 @@
 #pragma once
-#include "2Parse.hpp"
-#include "linenoise/linenoise.h"
-#include "c_string.hpp"
-#include <algorithm>
+#include "Lexer.hpp"
 
 namespace avm {
 

@@ -55,7 +55,7 @@ public:
 template <>
 struct Reader<inputSource::tty>
 {
-	c_string getInput() { return std::move(linenoise("yo@ ")); }
+	c_string getInput() { return std::move(linenoise("abstract-vm$ ")); }
 	auto isInputEndValid(const std::list<std::string>& tokens)
 	{
 		auto i = std::ranges::find(tokens, "exit");
