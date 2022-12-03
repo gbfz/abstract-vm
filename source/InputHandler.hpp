@@ -1,30 +1,34 @@
 #pragma once
+#include "Parser.hpp"
 #include "linenoise/linenoise.h"
 #include "Reader.hpp"
+#include <iostream>
+#include <fstream>
+#include <stdexcept>
 #include <string>
-#include <vector>
 #include <array>
 
 using std::literals::operator""s;
 
 namespace avm {
 
+std::list<std::string> readInput();
+std::list<std::string> readInput(std::ifstream file);
+
 template <inputSource source>
-struct inputHandler;
+class inputHandler;
 
 template <>
-struct inputHandler<inputSource::tty>
+class inputHandler<inputSource::tty>
 {
 private:
-	static const char** getDict(const char* pref)
+	static const std::array<const char*, 5> getDict(const std::string& type)
 	{
-		static const char* dict[] = {
-			"push int8(", "push int16(", "push int32(", "push float(", "push double(",
-			"assert int8(", "assert int16(", "assert int32(", "assert float(", "assert double(",
-		};
-		if (pref == "push"s)
-			return dict;
-		return dict + 5;
+		static std::array<std::array<const char*, 5>, 2> dict = {{
+			{ "push int8(", "push int16(", "push int32(", "push float(", "push double(" },
+			{ "assert int8(", "assert int16(", "assert int32(", "assert float(", "assert double(" }
+		}};
+		return dict[type == "assert"];
 	}
 
 	static auto setOperandCompletion(const std::string& buf, const auto dict, linenoiseCompletions* lc)
@@ -70,15 +74,50 @@ private:
 	}
 
 public:
+	Reader<inputSource::tty> reader;
+
+	void handle_error(const std::string& s)
+	{ std::cerr << "invalid input : " << s << '\n'; }
+
 	auto addHistory(const char* line) { linenoiseHistoryAdd(line); }
-	auto setCompletion() { linenoiseSetCompletionCallback(completion); }
+	inputHandler() { linenoiseSetCompletionCallback(completion); }
 };
 
 template <>
-struct inputHandler<inputSource::file>
+class inputHandler<inputSource::file>
 {
+public:
+	Reader<inputSource::file> reader;
+
+	std::list<std::string> inputLoop(auto&& handle)
+	{
+		std::list<std::string> tokens;
+		for (auto&& input : handle.reader)
+		{
+			auto begin = input.begin();
+			auto parse_ok = avm::parser::parse_string(begin, input.end(), tokens);
+			if (!parse_ok)
+				handle.handle_error({begin, input.end()});
+			handle.addHistory(input.data());
+		}
+		if (std::ranges::find(tokens, "exit") == tokens.end())
+			throw std::runtime_error("No 'exit' instruction\n");
+		return tokens;
+	}
+	void handle_error(const std::string& s)
+	{
+		auto msg = "invalid input on line "s + std::to_string(reader.cur_line)
+				 + ": '" + s + "'\n"
+				 + "execution terminated";
+		throw std::runtime_error(msg);
+	}
+
 	auto addHistory(const char*) {}
-	auto setCompletion() {}
+
+	inputHandler(std::ifstream stream) : reader(std::move(stream)) {}
+	inputHandler(inputHandler&& other) = default;
+	inputHandler& operator= (inputHandler&& other) = default;
+	~inputHandler() = default;
 };
 
 }

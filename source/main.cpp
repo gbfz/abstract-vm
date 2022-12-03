@@ -1,13 +1,9 @@
 #include "MachineStack.hpp"
-#include "OperandFactory.hpp"
-#include "eOperandType.hpp"
-#include "InputLoop.hpp"
+#include "InputHandler.hpp"
 #include <fstream>
-#include <functional>
 #include <stdexcept>
 #include <unordered_map>
-#include <exception>
-#include <list>
+#include <functional>
 #include <iostream>
 
 eOperandType toEnum(const std::string& t)

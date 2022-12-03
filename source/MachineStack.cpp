@@ -1,14 +1,12 @@
 #include "MachineStack.hpp"
-#include "Exceptions.hpp"
 
-MachineStack::MachineStack(MachineStack&& other) : values()
+MachineStack::MachineStack(MachineStack&& other)
 { *this = std::move(other); }
 
 MachineStack& MachineStack::operator=(MachineStack&& other)
 {
 	if (this == &other)
 		return *this;
-	values.clear();
 	values = std::move(other.values);
 	other.values.clear();
 	return *this;
@@ -25,8 +23,9 @@ void MachineStack::push(std::unique_ptr<const IOperand> operand)
 
 void MachineStack::dump(std::ostream& out) const
 {
+	out << "dump #" << dump_n++ << '\n';
 	for (auto it = values.crbegin(); it != values.crend(); ++it)
-		out << (*it)->toString() << '\n';
+		out << "  -  " << (*it)->toString() << '\n';
 }
 
 void MachineStack::assert(eOperandType type, std::string value)
@@ -34,7 +33,6 @@ void MachineStack::assert(eOperandType type, std::string value)
 	if (values.empty())
 		throw std::runtime_error("Assert on empty stack");
 	const auto& lhs = *values.back();
-	std::stringstream s;
 	if (lhs.getType() != type)
 		throw avm::type_assert_exception(type, lhs.getType());
 	if (lhs.toString() != value)
@@ -67,7 +65,7 @@ void MachineStack::mul()
 void MachineStack::div()
 {
 	auto [lhs, rhs] = pop_two();
-	if (rhs->toString().find_first_not_of(".0") == std::string::npos)
+	if (lhs->toString().find_first_not_of(".0") == std::string::npos)
 		throw avm::div_by_zero_exception();
 	values.emplace_back(*rhs / *lhs);
 }

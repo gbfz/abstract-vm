@@ -1,8 +1,7 @@
 #pragma once
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
-#include <stdexcept>
-#include <sstream>
+#include "Exceptions.hpp"
 #include <vector>
 #include <iostream>
 
@@ -38,6 +37,7 @@ private:
 
 // fields 
 	std::vector<ptr_t> values;
+	mutable size_t dump_n = 0;
 };
 
 std::ostream& operator<< (std::ostream& out, eOperandType type);

@@ -1,6 +1,6 @@
 #pragma once
 #include <boost/spirit/home/x3.hpp>
-#include "LexerUtils.hpp"
+#include "ParserUtils.hpp"
 #undef assert // not my fault it's a macro
 
 namespace avm::parser {

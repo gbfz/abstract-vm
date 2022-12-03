@@ -24,7 +24,6 @@ add_executable(avm
 	OperandFactory.cpp
 	MachineStack.cpp
 	Exceptions.cpp
-	c_string.cpp
 	InputLoop.cpp
 	usage.cpp
 	main.cpp)

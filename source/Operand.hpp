@@ -75,7 +75,9 @@ private:
 		mp_exp_t e;
 		std::string s = c.get_str(e);
 		s.insert(e, 1, '.');
-		if (s.back() == '.')
+		if (s == ".")
+			s = "0.0";
+		else if (s.back() == '.')
 			s += '0';
 		return s;
 	}
