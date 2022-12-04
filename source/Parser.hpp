@@ -57,4 +57,13 @@ bool parse_string(Iter& begin, Iter end, std::list<std::string>& acc)
 	return parse_ok;
 }
 
+template <class Iter>
+bool parse_discard(Iter& begin, Iter end)
+{
+	auto parse_ok = x3::phrase_parse(begin, end, S, x3::char_(' ', '\t'));
+	if (begin != end)
+		return false;
+	return parse_ok;
+}
+
 }

@@ -1,4 +1,4 @@
-#include "InputHandler.hpp"
+#include "Input.hpp"
 
 namespace avm {
 
@@ -24,13 +24,13 @@ namespace {
 
 std::list<std::string> readInput()
 {
-	auto input_handle = inputHandler<inputSource::tty>();
+	auto input_handle = InputHandler<eInputSource::tty>();
 	return inputLoop(input_handle);
 }
 
 std::list<std::string> readInput(std::ifstream file)
 {
-	auto input_handle = inputHandler<inputSource::file>(std::move(file));
+	auto input_handle = InputHandler<eInputSource::file>(std::move(file));
 	return inputLoop(input_handle);
 }
 

@@ -8,18 +8,18 @@
 
 namespace avm {
 
-enum class inputSource
+enum class eInputSource
 {
 	file,
 	tty,
 };
 
-template <inputSource source>
+template <eInputSource source>
 struct Reader;
 
 struct read_sentinel {};
 
-template <inputSource source>
+template <eInputSource source>
 class read_iterator
 {
 private:
@@ -35,20 +35,15 @@ public:
 
 	bool operator== (read_sentinel) const
 	{
-		if constexpr(source == inputSource::tty)
-		{
-			if (errno == EAGAIN)
-				std::exit(1);
+		if constexpr(source == eInputSource::tty)
 			return input == ";;";
-		}
-			// return input == ";;";
 		else return parent.stream.eof();
 	}
 
 	read_iterator& operator++ ()
 	{
-		if constexpr(source == inputSource::file)
-			if (++parent.cur_line > parent.max_lines)
+		if constexpr(source == eInputSource::file)
+			if (parent.cur_line > parent.max_lines)
 				throw std::runtime_error("File length is greater than chosen reader capacity");
 		input = parent.getInput();
 		return *this;
@@ -58,7 +53,7 @@ public:
 };
 
 template <>
-struct Reader<inputSource::tty>
+struct Reader<eInputSource::tty>
 {
 	std::string getInput()
 	{
@@ -67,29 +62,31 @@ struct Reader<inputSource::tty>
 		{
 			input = raw;
 			std::free(raw);
-		}
+		} else if (errno)
+			std::exit(2);
 		return input;
 	}
 
-	read_iterator<inputSource::tty> begin() { return {*this}; }
+	read_iterator<eInputSource::tty> begin() { return {*this}; }
 	read_sentinel end() { return {}; }
 };
 
 template <>
-struct Reader<inputSource::file>
+struct Reader<eInputSource::file>
 {
 	std::ifstream stream;
 	size_t max_lines;
-	size_t cur_line = 1;
+	size_t cur_line = 0;
 
 	std::string getInput()
 	{
 		std::string buf;
 		std::getline(stream, buf);
+		++cur_line;
 		return buf;
 	}
 
-	read_iterator<inputSource::file> begin() { return {*this}; }
+	read_iterator<eInputSource::file> begin() { return { *this }; }
 	read_sentinel end() { return {}; }
 
 	Reader() = default;

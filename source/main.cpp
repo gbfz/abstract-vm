@@ -1,5 +1,5 @@
 #include "MachineStack.hpp"
-#include "InputHandler.hpp"
+#include "Input.hpp"
 #include <fstream>
 #include <stdexcept>
 #include <unordered_map>
