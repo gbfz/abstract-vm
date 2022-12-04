@@ -6,6 +6,8 @@
 #include <gmpxx.h>
 #include <gmp.h>
 
+namespace avm {
+
 template <eOperandType Type>
 class Operand final : virtual public IOperand
 { 
@@ -94,11 +96,11 @@ private:
 		using enum eOperandType;
 		switch (type)
 		{
-			case Int8:   return avm::fits_impl<int8_t>(r);
-			case Int16:  return avm::fits_impl<int16_t>(r);
-			case Int32:  return avm::fits_impl<int32_t>(r);
-			case Float:  return avm::fits_impl<float>(r);
-			case Double: return avm::fits_impl<double>(r);
+			case Int8:   return fits_impl<int8_t>(r);
+			case Int16:  return fits_impl<int16_t>(r);
+			case Int32:  return fits_impl<int32_t>(r);
+			case Float:  return fits_impl<float>(r);
+			case Double: return fits_impl<double>(r);
 		}
 		throw std::logic_error("Unsupported type in overflow check");
 	}
@@ -141,3 +143,5 @@ private:
 // member fields 
 	const std::string value;
 };
+
+}

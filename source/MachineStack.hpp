@@ -5,6 +5,8 @@
 #include <vector>
 #include <iostream>
 
+namespace avm {
+
 class MachineStack
 {
 using ptr_t = std::unique_ptr<const IOperand>;
@@ -40,4 +42,6 @@ private:
 	mutable size_t dump_n = 0;
 };
 
-std::ostream& operator<< (std::ostream& out, eOperandType type);
+}
+
+std::ostream& operator<< (std::ostream& out, avm::eOperandType type);

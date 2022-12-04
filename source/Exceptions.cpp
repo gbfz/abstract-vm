@@ -1,4 +1,5 @@
 #include "Exceptions.hpp"
+#include "eOperandType.hpp"
 #include <unordered_map>
 
 namespace avm {
@@ -7,50 +8,43 @@ value_assert_exception::value_assert_exception(
 		const std::string& expected,
 		const std::string& actual) : std::exception()
 {
-	msg = "Value mismatch in assert(). Expected "
+	msg = "value mismatch in assert(). expected "
 		+ expected + ", got " + actual + "";
 }
 
 const char* value_assert_exception::what() const noexcept
 { return msg.c_str(); }
 
-type_assert_exception::type_assert_exception(
-		const eOperandType expected,
-		const eOperandType actual) : std::exception()
+type_assert_exception::type_assert_exception(eOperandType expected,
+											 eOperandType actual)
+	: std::exception()
 {
-	const std::unordered_map<eOperandType, std::string> tm = {
-		{ eOperandType::Int8,   "int8"   },
-		{ eOperandType::Int16,  "int16"  },
-		{ eOperandType::Int32,  "int32"  },
-		{ eOperandType::Float,  "float"  },
-		{ eOperandType::Double, "double" },
-	};
-	msg = "Type mismatch in assert(). Expected "
-		+ tm.at(expected) + ", got " + tm.at(actual);
+	msg = "type mismatch in assert(). expected "
+		+ toString(expected) + ", got " + toString(actual);
 }
 
 const char* type_assert_exception::what() const noexcept
 { return msg.c_str(); }
 
 const char* div_by_zero_exception::what() const noexcept
-{ return "Division by zero attempted"; }
+{ return "division by zero attempted"; }
 
 const char* mod_by_zero_exception::what() const noexcept
-{ return "Modulo by zero attempted"; }
+{ return "modulo by zero attempted"; }
 
 const char* pop_exception::what() const noexcept
-{ return "Attempt to pop empty stack"; }
+{ return "attempt to pop empty stack"; }
 
 const char* pop_two_exception::what() const noexcept
-{ return "Attempt to pop two operands while stack size is less than 2"; }
+{ return "attempt to pop two operands while stack size is less than 2"; }
 
 const char* print_exception::what() const noexcept
-{ return "Attempt to print value with type other than int8"; }
+{ return "attempt to print value with type other than int8"; }
 
 const char* modulo_with_fractions_exception::what() const noexcept
-{ return "Modulo not supported for fractions"; }
+{ return "modulo not supported for fractions"; }
 
 const char* overflow_exception::what() const noexcept
-{ return "Overflow!"; }
+{ return "last operation caused overflow"; }
 
 }

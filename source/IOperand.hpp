@@ -3,6 +3,8 @@
 #include <memory>
 #include "eOperandType.hpp"
 
+namespace avm {
+
 class IOperand
 {
 public:
@@ -28,3 +30,5 @@ public:
 
 	virtual ~IOperand() {}
 };
+
+}

@@ -15,11 +15,12 @@ add_library(linenoise STATIC
 link_libraries(gmpxx gmp linenoise)
 
 add_executable(avm
+	Input.cpp
+	InputCompletion.cpp
 	OperandFactory.cpp
 	MachineStack.cpp
 	Exceptions.cpp
-	Input.cpp
-	InputCompletion.cpp
+	eOperandType.cpp
 	usage.cpp
 	main.cpp
 )

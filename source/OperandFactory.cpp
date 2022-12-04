@@ -2,6 +2,8 @@
 #include "Operand.hpp"
 #include <unordered_map>
 
+namespace avm {
+
 using enum eOperandType;
 
 std::unique_ptr<const IOperand>
@@ -46,4 +48,6 @@ OperandFactory::createOperand(eOperandType type, const std::string& value)
 		{ Double, createDouble },
 	};
 	return func.at(type)(value);
+}
+
 }

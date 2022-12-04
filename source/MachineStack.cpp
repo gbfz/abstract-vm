@@ -1,5 +1,7 @@
 #include "MachineStack.hpp"
 
+namespace avm {
+
 MachineStack::MachineStack(MachineStack&& other)
 { *this = std::move(other); }
 
@@ -105,9 +107,11 @@ MachineStack::pop_two()
 	return { pop(), pop() };
 }
 
-std::ostream& operator<< (std::ostream& out, eOperandType type)
+}
+
+std::ostream& operator<< (std::ostream& out, avm::eOperandType type)
 {
-	using enum eOperandType;
+	using enum avm::eOperandType;
 	switch (type)
 	{
 		case Int8:   return out << "int8";

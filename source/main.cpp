@@ -1,26 +1,17 @@
 #include "MachineStack.hpp"
 #include "Input.hpp"
+#include "eOperandType.hpp"
 #include <fstream>
 #include <stdexcept>
 #include <unordered_map>
 #include <functional>
 #include <iostream>
 
-eOperandType toEnum(const std::string& t)
-{
-	static const std::unordered_map<std::string, eOperandType> type = {
-		{ "int8",   eOperandType::Int8   },
-		{ "int16",  eOperandType::Int16  },
-		{ "int32",  eOperandType::Int32  },
-		{ "float",  eOperandType::Float  },
-		{ "double", eOperandType::Double },
-	};
-	return type.at(t);
-}
+namespace avm {
 
 auto getTwo(std::list<std::string>& tokens)
 {
-	auto type = toEnum(std::move(tokens.front()));
+	auto type = avm::toEnum(std::move(tokens.front()));
 	tokens.pop_front();
 	auto value = std::move(tokens.front());
 	tokens.pop_front();
@@ -87,24 +78,26 @@ int work(char* filename)
 		auto token_stream = avm::readInput(std::move(file));
 		exec(token_stream);
 	} catch (std::exception& e) {
-		std::cout << e.what() << '\n';
+		std::cout << "fatal error: " << e.what() << '\n';
 		return 1;
 	}
 	return 0;
 }
+
+} // namespace avm
 
 int usage();
 
 int main(int ac, char** av)
 {
 	if (ac == 1)
-		return work();
+		return avm::work();
 	if (ac == 2)
 	{
 		std::string arg = av[1];
 		if (arg == "-h" || arg == "--help")
 			return usage();
-	   	return work(av[1]);
+	   	return avm::work(av[1]);
 	}
 	return usage();
 }

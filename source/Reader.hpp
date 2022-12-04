@@ -28,6 +28,7 @@ private:
 
 public:
 	read_iterator(Reader<source>& p) : parent(p), input(p.getInput()) {}
+
 	read_iterator(const read_iterator&) = delete;
 	read_iterator& operator= (const read_iterator&) = delete;
 	read_iterator(read_iterator&&) = delete;

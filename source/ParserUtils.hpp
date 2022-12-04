@@ -13,9 +13,10 @@ struct push_back_each
 {
 	void operator() (auto& ctx)
 	{
-		auto vec = boost::get<std::list<std::string>>(x3::_attr(ctx));
-		for (auto& s : vec)
-			x3::_val(ctx).emplace_back(std::move(s));
+		auto in = boost::get<std::list<std::string>>(x3::_attr(ctx));
+		auto& out = x3::_val(ctx);
+		for (auto& s : in)
+			out.emplace_back(std::move(s));
 	}
 };
 

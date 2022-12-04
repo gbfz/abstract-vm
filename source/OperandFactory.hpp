@@ -1,6 +1,8 @@
 #pragma once
 #include "IOperand.hpp"
 
+namespace avm {
+
 template <eOperandType Type>
 class Operand;
 
@@ -26,3 +28,5 @@ public:
 	static std::unique_ptr<const IOperand>
 	createOperand(eOperandType type, const std::string& value);
 };
+
+}
