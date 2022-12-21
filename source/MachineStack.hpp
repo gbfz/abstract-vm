@@ -25,8 +25,14 @@ public:
 	void mod();
 	void print(std::ostream& out = std::cout) const;
 
+	void save(const std::string& reg_name);
+	void save(std::list<std::string>& tokens);
+	void load(const std::string& reg_name);
+	void load(std::list<std::string>& tokens);
+	void dup();
+
 // ctors, dtors
-	MachineStack() = default;
+	MachineStack();
 	MachineStack(const MachineStack&) = delete;
 	MachineStack& operator= (const MachineStack&) = delete;
 	MachineStack(MachineStack&& other);
@@ -39,6 +45,7 @@ private:
 
 // fields 
 	std::vector<ptr_t> values;
+	std::unordered_map<std::string, ptr_t> registers;
 	mutable size_t dump_n = 0;
 };
 

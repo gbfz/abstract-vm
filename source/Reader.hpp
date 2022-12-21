@@ -59,16 +59,16 @@ struct Reader<eInputSource::tty>
 	std::string getInput()
 	{
 		std::string input;
-		if (char* raw = linenoise("abstract-vm$ "))
+		if (char* raw = linenoise("abstract-vm :: "))
 		{
 			input = raw;
 			std::free(raw);
-		} else if (errno)
+		} else if (errno) // oh the wonders of working with C libraries
 			std::exit(2);
 		return input;
 	}
 
-	read_iterator<eInputSource::tty> begin() { return {*this}; }
+	read_iterator<eInputSource::tty> begin() { return { *this }; }
 	read_sentinel end() { return {}; }
 };
 

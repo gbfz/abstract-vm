@@ -2,6 +2,12 @@
 
 namespace avm {
 
+MachineStack::MachineStack()
+{
+	registers["A"] = nullptr;
+	registers["B"] = nullptr;
+}
+
 MachineStack::MachineStack(MachineStack&& other)
 { *this = std::move(other); }
 
@@ -10,6 +16,7 @@ MachineStack& MachineStack::operator=(MachineStack&& other)
 	if (this == &other)
 		return *this;
 	values = std::move(other.values);
+	registers = std::move(other.registers);
 	other.values.clear();
 	return *this;
 }
@@ -87,6 +94,31 @@ void MachineStack::print(std::ostream& out) const
 		throw avm::print_exception();
 	unsigned char value = std::stoi(operand.toString());
 	out << value << '\n';
+}
+
+void MachineStack::dup()
+{
+	if (values.size() == 0)
+		throw avm::pop_exception(); // TODO: replace with dup analog
+	const auto& operand = *values.back();
+	push(operand.getType(), operand.toString());
+}
+
+void MachineStack::save(const std::string& reg_name)
+{
+	if (!registers.contains(reg_name))
+		throw std::runtime_error("saving to unknown register " + reg_name);
+	registers[reg_name] = std::move(values.back());
+	values.pop_back();
+}
+
+void MachineStack::load(const std::string& reg_name)
+{
+	if (!registers.contains(reg_name))
+		throw std::runtime_error("loading from unknown register");
+	if (registers.at(reg_name) == nullptr)
+		throw std::runtime_error("loading from empty register");
+	push(std::exchange(registers[reg_name], nullptr));
 }
 
 std::unique_ptr<const IOperand> MachineStack::pop()

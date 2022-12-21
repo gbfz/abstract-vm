@@ -37,10 +37,13 @@ namespace {
 			case 'a': linenoiseAddCompletion(lc, "assert");
 					  return linenoiseAddCompletion(lc, "add");
 			case 'd': linenoiseAddCompletion(lc, "dump");
+					  linenoiseAddCompletion(lc, "dup");
 					  return linenoiseAddCompletion(lc, "div");
 			case 'm': linenoiseAddCompletion(lc, "mul");
 					  return linenoiseAddCompletion(lc, "mod");
-			case 's': return linenoiseAddCompletion(lc, "sub");
+			case 's': linenoiseAddCompletion(lc, "sub");
+					  return linenoiseAddCompletion(lc, "save");
+			case 'l': return linenoiseAddCompletion(lc, "load");
 			case 'e': return linenoiseAddCompletion(lc, "exit");
 		}
 	}

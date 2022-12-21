@@ -30,6 +30,20 @@ auto assert(MachineStack& stack, std::list<std::string>& tokens)
 	stack.assert(type, std::move(value));
 }
 
+auto save(MachineStack& stack, std::list<std::string>& tokens)
+{
+	auto reg_name = std::move(tokens.front());
+	tokens.pop_front();
+	stack.save(std::move(reg_name));
+}
+
+auto load(MachineStack& stack, std::list<std::string>& tokens)
+{
+	auto reg_name = std::move(tokens.front());
+	tokens.pop_front();
+	stack.load(std::move(reg_name));
+}
+
 void exec(std::list<std::string>& tokens)
 {
 	MachineStack stack;
@@ -38,6 +52,8 @@ void exec(std::list<std::string>& tokens)
 	{
 		{ "push",   [&] { push  (stack, tokens); } },
 		{ "assert", [&] { assert(stack, tokens); } },
+		{ "save",   [&] { save  (stack, tokens); } },
+		{ "load",   [&] { load  (stack, tokens); } },
 		{ "print",  [&] { stack.print(); } },
 		{ "dump",   [&] { stack.dump(); } },
 		{ "pop",    [&] { stack.pop(); } },
@@ -46,6 +62,7 @@ void exec(std::list<std::string>& tokens)
 		{ "mul",    [&] { stack.mul(); } },
 		{ "div",    [&] { stack.div(); } },
 		{ "mod",    [&] { stack.mod(); } },
+		{ "dup",    [&] { stack.dup(); } },
 		{ "exit",   [ ] { } }
 	};
 
@@ -63,7 +80,7 @@ int work()
 		auto token_stream = avm::readInput();
 		exec(token_stream);
 	} catch (std::exception& e) {
-		std::cout << e.what() << '\n';
+		std::cout << "fatal error: " << e.what() << '\n';
 		return 1;
 	}
 	return 0;

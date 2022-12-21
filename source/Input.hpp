@@ -3,6 +3,7 @@
 #include "Reader.hpp"
 #include "InputCompletion.hpp"
 #include "linenoise/linenoise.h"
+#include <ios>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -39,12 +40,12 @@ struct InputHandler<eInputSource::file>
 	Reader<eInputSource::file> reader;
 	bool had_error = false;
 
-	[[noreturn]]
 	void handle_error(const std::string& s, std::ostream& out = std::cerr)
 	{
-		out << "invalid input on line " + std::to_string(reader.cur_line) + ": '" + s + "'\n";
+		out << "invalid input on line " + std::to_string(reader.cur_line) + ": '" + s + "'";
 		if (!had_error && (had_error = true))
-			 out << "NOTE: i'll parse the rest of the file but won't execute it.\n";
+			 out << ". NOTE: i'll parse the rest of the file but won't execute it.";
+		out << '\n';
 		for (auto&& input : reader)
 		{
 			auto begin = input.begin();
@@ -52,7 +53,7 @@ struct InputHandler<eInputSource::file>
 			if (!parse_ok)
 				handle_error({begin, input.end()}, out);
 		}
-		exit(1);
+		throw std::invalid_argument("invalid input in given file");
 	}
 
 	auto addHistory(const char*) {}
