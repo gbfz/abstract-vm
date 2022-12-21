@@ -1,4 +1,5 @@
 #include "MachineStack.hpp"
+#include <utility>
 
 namespace avm {
 

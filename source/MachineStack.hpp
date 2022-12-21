@@ -4,6 +4,7 @@
 #include "Exceptions.hpp"
 #include <vector>
 #include <iostream>
+#include <unordered_map>
 
 namespace avm {
 
@@ -26,9 +27,7 @@ public:
 	void print(std::ostream& out = std::cout) const;
 
 	void save(const std::string& reg_name);
-	void save(std::list<std::string>& tokens);
 	void load(const std::string& reg_name);
-	void load(std::list<std::string>& tokens);
 	void dup();
 
 // ctors, dtors
