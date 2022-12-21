@@ -1,11 +1,13 @@
 #include "MachineStack.hpp"
 #include "Input.hpp"
+#include "VirtualMachine.hpp"
 #include "eOperandType.hpp"
 #include <fstream>
 #include <stdexcept>
 #include <unordered_map>
 #include <functional>
 #include <iostream>
+#undef assert
 
 namespace avm {
 
@@ -107,14 +109,15 @@ int usage();
 
 int main(int ac, char** av)
 {
+	avm::VirtualMachine vm;
 	if (ac == 1)
-		return avm::work();
+		return vm.exec();
 	if (ac == 2)
 	{
 		std::string arg = av[1];
 		if (arg == "-h" || arg == "--help")
 			return usage();
-	   	return avm::work(av[1]);
+	   	return vm.exec(av[1]);
 	}
 	return usage();
 }

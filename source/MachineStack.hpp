@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <unordered_map>
+#include <list>
 
 namespace avm {
 
@@ -13,12 +14,14 @@ class MachineStack
 using ptr_t = std::unique_ptr<const IOperand>;
 public:
 // stack instructions 
-	void push(eOperandType type, std::string value);
 	void push(ptr_t operand);
+	void push(std::list<std::string>& tokens);
+
 	ptr_t pop();
 	void dump(std::ostream& out = std::cout) const;
 	void assert(eOperandType type, std::string value);
-	void assert(ptr_t operand);
+	void assert(std::list<std::string>& tokens);
+
 	void add();
 	void sub();
 	void mul();
@@ -27,7 +30,9 @@ public:
 	void print(std::ostream& out = std::cout) const;
 
 	void save(const std::string& reg_name);
+	void save(std::list<std::string>& tokens);
 	void load(const std::string& reg_name);
+	void load(std::list<std::string>& tokens);
 	void dup();
 
 // ctors, dtors
@@ -41,6 +46,7 @@ public:
 private:
 // utils 
 	std::pair<ptr_t, ptr_t> pop_two();
+	std::pair<eOperandType, std::string> pop_two_tokens(std::list<std::string>& tokens);
 
 // fields 
 	std::vector<ptr_t> values;

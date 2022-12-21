@@ -6,7 +6,7 @@ project(avm)
 set(CMAKE_CXX_COMPILER "g++")
 set(CMAKE_CXX_STANDARD 20)
 
-add_compile_options(-g -Wall -Wextra -Werror)
+add_compile_options(-g -Wall -Wextra -Werror -Wno-cast-function-type)
 
 add_library(linenoise STATIC
 	linenoise/linenoise.c
@@ -21,6 +21,7 @@ add_executable(avm
 	MachineStack.cpp
 	Exceptions.cpp
 	eOperandType.cpp
+	VirtualMachine.cpp
 	usage.cpp
 	main.cpp
 )

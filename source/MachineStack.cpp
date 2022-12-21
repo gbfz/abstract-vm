@@ -1,5 +1,8 @@
 #include "MachineStack.hpp"
+#include "OperandFactory.hpp"
+#include <list>
 #include <utility>
+#include "eOperandType.hpp"
 
 namespace avm {
 
@@ -17,19 +20,21 @@ MachineStack& MachineStack::operator=(MachineStack&& other)
 	if (this == &other)
 		return *this;
 	values = std::move(other.values);
-	registers = std::move(other.registers);
 	other.values.clear();
+	registers = std::move(other.registers);
+	other.registers["A"] = nullptr;
+	other.registers["B"] = nullptr;
 	return *this;
-}
-
-void MachineStack::push(eOperandType type, std::string value)
-{
-	auto operand = OperandFactory::createOperand(type, std::move(value));
-	values.emplace_back(std::move(operand));
 }
 
 void MachineStack::push(std::unique_ptr<const IOperand> operand)
 { values.emplace_back(std::move(operand)); }
+
+void MachineStack::push(std::list<std::string>& tokens)
+{
+	auto [type, value] = pop_two_tokens(tokens);
+	push(OperandFactory::createOperand(type, std::move(value)));
+}
 
 void MachineStack::dump(std::ostream& out) const
 {
@@ -49,10 +54,11 @@ void MachineStack::assert(eOperandType type, std::string value)
 		throw avm::value_assert_exception(value, lhs.toString());
 }
 
-void MachineStack::assert(std::unique_ptr<const IOperand> op)
+void MachineStack::assert(std::list<std::string>& tokens)
 {
-	assert(op->getType(), op->toString());
-};
+	auto [type, value] = pop_two_tokens(tokens);
+	assert(type, std::move(value));
+}
 
 void MachineStack::add()
 {
@@ -101,8 +107,8 @@ void MachineStack::dup()
 {
 	if (values.size() == 0)
 		throw avm::pop_exception(); // TODO: replace with dup analog
-	const auto& operand = *values.back();
-	push(operand.getType(), operand.toString());
+	const auto& op = *values.back();
+	push(OperandFactory::createOperand(op.getType(), op.toString()));
 }
 
 void MachineStack::save(const std::string& reg_name)
@@ -113,8 +119,29 @@ void MachineStack::save(const std::string& reg_name)
 	values.pop_back();
 }
 
+void MachineStack::save(std::list<std::string>& tokens)
+{
+	auto reg_name = std::move(tokens.front());
+	tokens.pop_front();
+	if (!registers.contains(reg_name))
+		throw std::runtime_error("saving to unknown register " + reg_name);
+	registers[reg_name] = std::move(values.back());
+	values.pop_back();
+}
+
 void MachineStack::load(const std::string& reg_name)
 {
+	if (!registers.contains(reg_name))
+		throw std::runtime_error("loading from unknown register");
+	if (registers.at(reg_name) == nullptr)
+		throw std::runtime_error("loading from empty register");
+	push(std::exchange(registers[reg_name], nullptr));
+}
+
+void MachineStack::load(std::list<std::string>& tokens)
+{
+	auto reg_name = std::move(tokens.front());
+	tokens.pop_front();
 	if (!registers.contains(reg_name))
 		throw std::runtime_error("loading from unknown register");
 	if (registers.at(reg_name) == nullptr)
@@ -138,6 +165,16 @@ MachineStack::pop_two()
 	if (values.size() < 2)
 		throw avm::pop_two_exception();
 	return { pop(), pop() };
+}
+
+std::pair<eOperandType, std::string>
+MachineStack::pop_two_tokens(std::list<std::string>& tokens)
+{
+	auto type = avm::toEnum(std::move(tokens.front()));
+	tokens.pop_front();
+	auto value = std::move(tokens.front());
+	tokens.pop_front();
+	return { std::move(type), std::move(value) };
 }
 
 }
