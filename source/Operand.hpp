@@ -102,7 +102,7 @@ private:
 			case Float:  return fits_impl<float>(r);
 			case Double: return fits_impl<double>(r);
 		}
-		throw std::domain_error("Unsupported type in overflow check");
+		throw std::domain_error("unsupported type in overflow check");
 	}
 
 public:
