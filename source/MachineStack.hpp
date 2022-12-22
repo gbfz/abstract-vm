@@ -1,7 +1,6 @@
 #pragma once
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
-#include "Exceptions.hpp"
 #include <vector>
 #include <iostream>
 #include <unordered_map>

@@ -2,9 +2,9 @@
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
 #include "OverflowCheck.hpp"
-#include "Exceptions.hpp"
 #include <gmpxx.h>
 #include <gmp.h>
+#include <stdexcept>
 
 namespace avm {
 
@@ -28,7 +28,7 @@ public:
 	std::unique_ptr<const IOperand> operator% (const IOperand& rhs) const override
 	{
 		if (isFloatOperation(rhs))
-			throw avm::modulo_with_fractions_exception();
+			throw std::domain_error("modulo not supported for fractions");
 		return operate<mpz_class>(rhs, mpz_mod);
 	}
 
@@ -50,7 +50,7 @@ private:
 		gmpT result;
 		func(get_mp_t(result), get_mp_t(a), get_mp_t(b));
 		if (!fits(type, result))
-			throw avm::overflow_exception();
+			throw std::overflow_error("last operation caused under- or overflow");
 		return OperandFactory::createOperand(type, toString(result));
 	}
 
@@ -102,7 +102,7 @@ private:
 			case Float:  return fits_impl<float>(r);
 			case Double: return fits_impl<double>(r);
 		}
-		throw std::logic_error("Unsupported type in overflow check");
+		throw std::domain_error("Unsupported type in overflow check");
 	}
 
 public:

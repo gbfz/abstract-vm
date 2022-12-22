@@ -1,8 +1,11 @@
 #include "MachineStack.hpp"
 #include "OperandFactory.hpp"
 #include <list>
+#include <stdexcept>
 #include <utility>
 #include "eOperandType.hpp"
+
+using std::string_literals::operator""s;
 
 namespace avm {
 
@@ -46,12 +49,14 @@ void MachineStack::dump(std::ostream& out) const
 void MachineStack::assert(eOperandType type, std::string value)
 {
 	if (values.empty())
-		throw std::runtime_error("Assert on empty stack");
+		throw std::domain_error("Assert on empty stack");
 	const auto& lhs = *values.back();
-	if (lhs.getType() != type)
-		throw avm::type_assert_exception(type, lhs.getType());
-	if (lhs.toString() != value)
-		throw avm::value_assert_exception(value, lhs.toString());
+	if (lhs.getType() != type || lhs.toString() != value)
+	{
+		auto expected = toString(type) + "("s + value + ")"s;
+		auto actual   = toString(lhs.getType()) + "("s + lhs.toString() + ")"s;
+		throw std::domain_error("mismatch in assert(). expected "s + expected + ", got"s + actual);
+	}
 }
 
 void MachineStack::assert(std::list<std::string>& tokens)
@@ -82,7 +87,7 @@ void MachineStack::div()
 {
 	auto [lhs, rhs] = pop_two();
 	if (lhs->toString().find_first_not_of(".0") == std::string::npos)
-		throw avm::div_by_zero_exception();
+		throw std::invalid_argument("division by zero attempted");
 	values.emplace_back(*rhs / *lhs);
 }
 
@@ -90,7 +95,7 @@ void MachineStack::mod()
 {
 	auto [lhs, rhs] = pop_two();
 	if (rhs->toString().find_first_not_of(".0") == std::string::npos)
-		throw avm::mod_by_zero_exception();
+		throw std::invalid_argument("modulo by zero attempted");
 	values.emplace_back(*rhs % *lhs);
 }
 
@@ -98,7 +103,7 @@ void MachineStack::print(std::ostream& out) const
 {
 	const auto& operand = *values.back();
 	if (operand.getType() != eOperandType::Int8)
-		throw avm::print_exception();
+		throw std::invalid_argument("attempt to print value with type other than int8");
 	unsigned char value = std::stoi(operand.toString());
 	out << value << '\n';
 }
@@ -106,17 +111,9 @@ void MachineStack::print(std::ostream& out) const
 void MachineStack::dup()
 {
 	if (values.size() == 0)
-		throw avm::pop_exception(); // TODO: replace with dup analog
+		throw std::out_of_range("attempt to dup value from empty stack");
 	const auto& op = *values.back();
 	push(OperandFactory::createOperand(op.getType(), op.toString()));
-}
-
-void MachineStack::save(const std::string& reg_name)
-{
-	if (!registers.contains(reg_name))
-		throw std::runtime_error("saving to unknown register " + reg_name);
-	registers[reg_name] = std::move(values.back());
-	values.pop_back();
 }
 
 void MachineStack::save(std::list<std::string>& tokens)
@@ -124,18 +121,9 @@ void MachineStack::save(std::list<std::string>& tokens)
 	auto reg_name = std::move(tokens.front());
 	tokens.pop_front();
 	if (!registers.contains(reg_name))
-		throw std::runtime_error("saving to unknown register " + reg_name);
+		throw std::domain_error("saving to unknown register " + reg_name);
 	registers[reg_name] = std::move(values.back());
 	values.pop_back();
-}
-
-void MachineStack::load(const std::string& reg_name)
-{
-	if (!registers.contains(reg_name))
-		throw std::runtime_error("loading from unknown register");
-	if (registers.at(reg_name) == nullptr)
-		throw std::runtime_error("loading from empty register");
-	push(std::exchange(registers[reg_name], nullptr));
 }
 
 void MachineStack::load(std::list<std::string>& tokens)
@@ -143,16 +131,16 @@ void MachineStack::load(std::list<std::string>& tokens)
 	auto reg_name = std::move(tokens.front());
 	tokens.pop_front();
 	if (!registers.contains(reg_name))
-		throw std::runtime_error("loading from unknown register");
+		throw std::domain_error("loading from unknown register");
 	if (registers.at(reg_name) == nullptr)
-		throw std::runtime_error("loading from empty register");
+		throw std::domain_error("loading from empty register");
 	push(std::exchange(registers[reg_name], nullptr));
 }
 
 std::unique_ptr<const IOperand> MachineStack::pop()
 {
 	if (values.size() == 0)
-		throw avm::pop_exception();
+		throw std::out_of_range("attempt to pop empty stack");
 	auto operand = std::move(values.back());
 	values.pop_back();
 	return operand;
@@ -163,7 +151,7 @@ std::pair<std::unique_ptr<const IOperand>,
 MachineStack::pop_two()
 {
 	if (values.size() < 2)
-		throw avm::pop_two_exception();
+		throw std::out_of_range("attempt to pop 2 operands when stack size < 2");
 	return { pop(), pop() };
 }
 

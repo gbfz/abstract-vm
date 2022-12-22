@@ -1,9 +1,9 @@
 #pragma once
 #include "Input.hpp"
 #include "MachineStack.hpp"
-#include "Exceptions.hpp"
-#include <typeindex>
 #include <unordered_map>
+
+using std::string_literals::operator""s;
 
 namespace avm {
 
@@ -31,21 +31,20 @@ private:
 	};
 
 	void exec_internal(const char* stream_name);
-	void read_tokens_from_stdin();
-	void read_tokens_from_file(const char* filename = "");
+	std::list<std::string> read_from_stdin();
+	std::list<std::string> read_from_file(const char* filename = "");
 
 public:
 	int exec(const char* stream_name = "");
 
-	std::list<std::string> get_token_stream();
-	std::list<std::string> get_token_stream(const char* filename);
-
 	VirtualMachine() = default;
-	VirtualMachine(VirtualMachine&& other);
-	VirtualMachine& operator= (VirtualMachine&& other);
+	VirtualMachine(VirtualMachine&& other) = default;
+	VirtualMachine& operator= (VirtualMachine&& other) = default;
 
 	VirtualMachine(const VirtualMachine&) = delete;
 	VirtualMachine& operator= (const VirtualMachine&) = delete;
+
+	int usage() const;
 };
 
 }
