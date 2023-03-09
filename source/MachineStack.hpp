@@ -2,15 +2,15 @@
 #include "IOperand.hpp"
 #include "OperandFactory.hpp"
 #include <vector>
-#include <iostream>
 #include <unordered_map>
 #include <list>
+#include <iostream>
 
 namespace avm {
 
 class MachineStack
 {
-using ptr_t = std::unique_ptr<const IOperand>;
+	using ptr_t = std::unique_ptr<const IOperand>;
 public:
 // stack instructions 
 	void push(ptr_t operand);

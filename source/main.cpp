@@ -2,9 +2,12 @@
 
 int usage();
 
-int main(int ac, char** av) {
+int main(int ac, char** av)
+{
 	avm::VirtualMachine vm;
-	switch (ac) {
+
+	switch (ac)
+	{
 		case 1: if (not isatty(fileno(stdin))) // read from pipe
 					return vm.exec("/dev/stdin");
 				return vm.exec();

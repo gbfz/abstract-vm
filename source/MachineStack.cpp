@@ -42,15 +42,15 @@ void MachineStack::push(std::list<std::string>& tokens)
 void MachineStack::dump(std::ostream& out) const
 {
 	out << "dump #" << dump_n++ << '\n';
-	for (auto it = values.crbegin(); it != values.crend(); ++it)
-		out << "  -  " << (*it)->toString() << '\n';
+	// for (auto it = values.crbegin(); it != values.crend(); ++it)
+		// out << "  -  " << (*it)->toString() << '\n';
 }
 
 void MachineStack::assert(eOperandType type, std::string value)
 {
 	if (values.empty())
 		throw std::domain_error("Assert on empty stack");
-	const auto& lhs = *values.back();
+	auto const& lhs = *values.back();
 	if (lhs.getType() != type || lhs.toString() != value)
 	{
 		auto expected = toString(type) + "("s + value + ")"s;
@@ -101,7 +101,7 @@ void MachineStack::mod()
 
 void MachineStack::print(std::ostream& out) const
 {
-	const auto& operand = *values.back();
+	auto const& operand = *values.back();
 	if (operand.getType() != eOperandType::Int8)
 		throw std::invalid_argument("attempt to print value with type other than int8");
 	unsigned char value = std::stoi(operand.toString());
@@ -112,7 +112,7 @@ void MachineStack::dup()
 {
 	if (values.size() == 0)
 		throw std::out_of_range("attempt to dup value from empty stack");
-	const auto& op = *values.back();
+	auto const& op = *values.back();
 	push(OperandFactory::createOperand(op.getType(), op.toString()));
 }
 
@@ -128,16 +128,17 @@ void MachineStack::save(std::list<std::string>& tokens)
 
 void MachineStack::load(std::list<std::string>& tokens)
 {
+	auto const& reg_name_check = tokens.front();
+	if (!registers.contains(reg_name_check))
+		throw std::domain_error("loading from unknown register");
+	if (registers.at(reg_name_check) == nullptr)
+		throw std::domain_error("loading from empty register");
 	auto reg_name = std::move(tokens.front());
 	tokens.pop_front();
-	if (!registers.contains(reg_name))
-		throw std::domain_error("loading from unknown register");
-	if (registers.at(reg_name) == nullptr)
-		throw std::domain_error("loading from empty register");
 	push(std::exchange(registers[reg_name], nullptr));
 }
 
-std::unique_ptr<const IOperand> MachineStack::pop()
+auto MachineStack::pop() -> std::unique_ptr<const IOperand>
 {
 	if (values.size() == 0)
 		throw std::out_of_range("attempt to pop empty stack");
@@ -146,23 +147,23 @@ std::unique_ptr<const IOperand> MachineStack::pop()
 	return operand;
 }
 
-std::pair<std::unique_ptr<const IOperand>,
-		  std::unique_ptr<const IOperand>>
-MachineStack::pop_two()
+auto MachineStack::pop_two()
+	-> std::pair<std::unique_ptr<IOperand const>,
+				 std::unique_ptr<IOperand const>>
 {
 	if (values.size() < 2)
 		throw std::out_of_range("attempt to pop 2 operands when stack size < 2");
 	return { pop(), pop() };
 }
 
-std::pair<eOperandType, std::string>
-MachineStack::pop_two_tokens(std::list<std::string>& tokens)
+auto MachineStack::pop_two_tokens(std::list<std::string>& tokens)
+	-> std::pair<eOperandType, std::string>
 {
-	auto type = avm::toEnum(std::move(tokens.front()));
+	avm::eOperandType type { avm::toEnum(std::move(tokens.front())) };
 	tokens.pop_front();
-	auto value = std::move(tokens.front());
+	std::string value { std::move(tokens.front()) };
 	tokens.pop_front();
-	return { std::move(type), std::move(value) };
+	return { type, value };
 }
 
 }

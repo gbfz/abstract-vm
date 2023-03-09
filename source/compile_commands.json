@@ -1,7 +1,42 @@
 [
 {
   "directory": "/home/mgold/school/abstract-vm/build",
-  "command": "g++   -g -Wall -Wextra -std=c++20 -std=gnu++20 -o CMakeFiles/avm.dir/add.cpp.o -c /home/mgold/school/abstract-vm/source/main.cpp",
+  "command": "/usr/bin/cc -DLINENOISE_PRIVATE  -g -Wall -Wextra -Werror -Wpedantic -o CMakeFiles/linenoise.dir/linenoise/linenoise.c.o -c /home/mgold/school/abstract-vm/source/linenoise/linenoise.c",
+  "file": "/home/mgold/school/abstract-vm/source/linenoise/linenoise.c"
+},
+{
+  "directory": "/home/mgold/school/abstract-vm/build",
+  "command": "g++  -I/home/mgold/school/abstract-vm/source -g -Wall -Wextra -Werror -Wpedantic -std=gnu++20 -o CMakeFiles/avm.dir/Input.cpp.o -c /home/mgold/school/abstract-vm/source/Input.cpp",
+  "file": "/home/mgold/school/abstract-vm/source/Input.cpp"
+},
+{
+  "directory": "/home/mgold/school/abstract-vm/build",
+  "command": "g++  -I/home/mgold/school/abstract-vm/source -g -Wall -Wextra -Werror -Wpedantic -std=gnu++20 -o CMakeFiles/avm.dir/InputCompletion.cpp.o -c /home/mgold/school/abstract-vm/source/InputCompletion.cpp",
+  "file": "/home/mgold/school/abstract-vm/source/InputCompletion.cpp"
+},
+{
+  "directory": "/home/mgold/school/abstract-vm/build",
+  "command": "g++  -I/home/mgold/school/abstract-vm/source -g -Wall -Wextra -Werror -Wpedantic -std=gnu++20 -o CMakeFiles/avm.dir/OperandFactory.cpp.o -c /home/mgold/school/abstract-vm/source/OperandFactory.cpp",
+  "file": "/home/mgold/school/abstract-vm/source/OperandFactory.cpp"
+},
+{
+  "directory": "/home/mgold/school/abstract-vm/build",
+  "command": "g++  -I/home/mgold/school/abstract-vm/source -g -Wall -Wextra -Werror -Wpedantic -std=gnu++20 -o CMakeFiles/avm.dir/MachineStack.cpp.o -c /home/mgold/school/abstract-vm/source/MachineStack.cpp",
+  "file": "/home/mgold/school/abstract-vm/source/MachineStack.cpp"
+},
+{
+  "directory": "/home/mgold/school/abstract-vm/build",
+  "command": "g++  -I/home/mgold/school/abstract-vm/source -g -Wall -Wextra -Werror -Wpedantic -std=gnu++20 -o CMakeFiles/avm.dir/eOperandType.cpp.o -c /home/mgold/school/abstract-vm/source/eOperandType.cpp",
+  "file": "/home/mgold/school/abstract-vm/source/eOperandType.cpp"
+},
+{
+  "directory": "/home/mgold/school/abstract-vm/build",
+  "command": "g++  -I/home/mgold/school/abstract-vm/source -g -Wall -Wextra -Werror -Wpedantic -std=gnu++20 -o CMakeFiles/avm.dir/VirtualMachine.cpp.o -c /home/mgold/school/abstract-vm/source/VirtualMachine.cpp",
+  "file": "/home/mgold/school/abstract-vm/source/VirtualMachine.cpp"
+},
+{
+  "directory": "/home/mgold/school/abstract-vm/build",
+  "command": "g++  -I/home/mgold/school/abstract-vm/source -g -Wall -Wextra -Werror -Wpedantic -std=gnu++20 -o CMakeFiles/avm.dir/main.cpp.o -c /home/mgold/school/abstract-vm/source/main.cpp",
   "file": "/home/mgold/school/abstract-vm/source/main.cpp"
 }
 ]
